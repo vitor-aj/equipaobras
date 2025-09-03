@@ -3,7 +3,28 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { PedidoDetailModal } from "@/components/pedidos/PedidoDetailModal";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Plus, 
   Search, 
@@ -13,7 +34,9 @@ import {
   CheckCircle, 
   XCircle,
   AlertTriangle,
-  Filter
+  Filter,
+  Edit,
+  Trash2
 } from "lucide-react";
 
 interface Pedido {
@@ -27,13 +50,12 @@ interface Pedido {
 
 const Pedidos = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("todos");
   const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-
-  // Mock data - seria conectado ao banco via Supabase
-  const pedidos: Pedido[] = [
+  const [pedidos, setPedidos] = useState<Pedido[]>([
     {
       id: "PED-001",
       cliente: "Construtora ABC Ltda",
@@ -71,7 +93,7 @@ const Pedidos = () => {
       status: "Aprovado",
       data: "2024-01-10"
     }
-  ];
+  ]);
 
   const filteredPedidos = pedidos.filter(pedido => {
     const matchesSearch = pedido.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -80,34 +102,38 @@ const Pedidos = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Em Análise da IA":
-        return "bg-blue-50 text-blue-700 border-blue-200";
-      case "Análise do Faturista":
-        return "bg-orange-50 text-orange-700 border-orange-200";
-      case "Aprovado":
-        return "bg-green-50 text-green-700 border-green-200";
-      case "Devolvido para Ajuste":
-        return "bg-red-50 text-red-700 border-red-200";
-      default:
-        return "bg-gray-50 text-gray-700 border-gray-200";
-    }
+  const getStatusBadge = (status: Pedido["status"]) => {
+    const variants = {
+      "Em Análise da IA": { variant: "secondary" as const, icon: Clock, className: "bg-blue-500/10 text-blue-700 border-blue-500/20" },
+      "Análise do Faturista": { variant: "destructive" as const, icon: AlertTriangle, className: "bg-orange-500/10 text-orange-700 border-orange-500/20" },
+      "Aprovado": { variant: "default" as const, icon: CheckCircle, className: "bg-success/10 text-success border-success/20" },
+      "Devolvido para Ajuste": { variant: "destructive" as const, icon: XCircle, className: "bg-destructive/10 text-destructive border-destructive/20" }
+    };
+    
+    const config = variants[status];
+    const Icon = config.icon;
+    
+    return (
+      <Badge className={config.className}>
+        <Icon className="h-3 w-3 mr-1" />
+        {status}
+      </Badge>
+    );
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "Em Análise da IA":
-        return <Clock className="h-4 w-4" />;
-      case "Análise do Faturista":
-        return <AlertTriangle className="h-4 w-4" />;
-      case "Aprovado":
-        return <CheckCircle className="h-4 w-4" />;
-      case "Devolvido para Ajuste":
-        return <XCircle className="h-4 w-4" />;
-      default:
-        return <FileText className="h-4 w-4" />;
-    }
+  const handleEditPedido = (pedido: Pedido) => {
+    toast({
+      title: "Editar Pedido",
+      description: `Funcionalidade de edição do pedido ${pedido.id} será implementada em breve.`,
+    });
+  };
+
+  const handleDeletePedido = (id: string) => {
+    setPedidos(prev => prev.filter(p => p.id !== id));
+    toast({
+      title: "Pedido Excluído",
+      description: "O pedido foi excluído com sucesso.",
+    });
   };
 
   const statusCounts = {
@@ -232,69 +258,97 @@ const Pedidos = () => {
         </CardContent>
       </Card>
 
-      {/* Pedidos List */}
-      <div className="space-y-4">
-        {filteredPedidos.map((pedido) => (
-          <Card key={pedido.id} className="shadow-custom-md border-border hover:shadow-custom-lg transition-fast gradient-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 flex-1">
-                  <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <FileText className="h-6 w-6 text-primary" />
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-foreground">
-                        {pedido.id}
-                      </h3>
-                      <span className="text-lg font-bold text-foreground">
-                        {pedido.valor}
-                      </span>
-                    </div>
-                    
-                    <p className="text-sm text-muted-foreground mb-1">
-                      {pedido.cliente}
-                    </p>
-                    
+      {/* Tabela de Pedidos */}
+      <Card className="shadow-custom-md border-border">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Número do Pedido</TableHead>
+                <TableHead>Data do Pedido</TableHead>
+                <TableHead>Cliente</TableHead>
+                <TableHead>Valor do Pedido</TableHead>
+                <TableHead>Status do Pedido</TableHead>
+                <TableHead className="text-center">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredPedidos.map((pedido) => (
+                <TableRow key={pedido.id}>
+                  <TableCell className="font-medium">
                     <div className="flex items-center gap-3">
-                      <span 
-                        className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full border font-medium ${getStatusColor(pedido.status)}`}
-                      >
-                        {getStatusIcon(pedido.status)}
-                        {pedido.status}
-                      </span>
-                      
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(pedido.data).toLocaleDateString('pt-BR')}
-                      </span>
+                      <div className="h-8 w-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <FileText className="h-4 w-4 text-primary" />
+                      </div>
+                      <span className="font-semibold">{pedido.id}</span>
                     </div>
-                    
-                    {pedido.observacoes && (
-                      <p className="text-sm text-muted-foreground mt-2 italic">
-                        "{pedido.observacoes}"
-                      </p>
-                    )}
-                  </div>
-                </div>
-                
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex items-center gap-2 ml-4"
-                  onClick={() => {
-                    setSelectedPedido(pedido);
-                    setIsDetailModalOpen(true);
-                  }}
-                >
-                  <Eye className="h-4 w-4" />
-                  Visualizar
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(pedido.data).toLocaleDateString('pt-BR')}
+                  </TableCell>
+                  <TableCell>{pedido.cliente}</TableCell>
+                  <TableCell className="font-semibold">{pedido.valor}</TableCell>
+                  <TableCell>
+                    {getStatusBadge(pedido.status)}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-center gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0"
+                        onClick={() => {
+                          setSelectedPedido(pedido);
+                          setIsDetailModalOpen(true);
+                        }}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0"
+                        onClick={() => handleEditPedido(pedido)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Tem certeza que deseja excluir o pedido "{pedido.id}"? 
+                              Esta ação não pode ser desfeita.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => handleDeletePedido(pedido.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Excluir
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       {filteredPedidos.length === 0 && (
         <div className="text-center py-12">
