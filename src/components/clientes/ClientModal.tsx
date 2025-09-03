@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, FileText, X, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export interface Cliente {
   id?: string;
@@ -109,6 +110,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, AnexoFile>>({});
   const [showSuccess, setShowSuccess] = useState(false);
+  const { toast } = useToast();
   
   const form = useForm<ClientFormData>({
     resolver: zodResolver(clientSchema),
@@ -143,6 +145,10 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
     
     if (!cliente) {
       setShowSuccess(true);
+      toast({
+        title: "Cadastro Enviado!",
+        description: "O cadastro do cliente passará por aprovação. Você será notificado sobre o status.",
+      });
       setTimeout(() => {
         onSave(clienteData);
         form.reset();
@@ -150,9 +156,13 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
         setCurrentStep(1);
         setShowSuccess(false);
         onClose();
-      }, 2000);
+      }, 2500);
     } else {
       onSave(clienteData);
+      toast({
+        title: "Cliente Atualizado!",
+        description: "As informações do cliente foram atualizadas com sucesso.",
+      });
       form.reset();
       setUploadedFiles({});
       setCurrentStep(1);
@@ -214,11 +224,16 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-md">
           <div className="text-center py-8">
-            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            <CheckCircle className="h-16 w-16 text-success mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Cadastro Enviado!</h3>
-            <p className="text-muted-foreground">
-              O cadastro do cliente foi enviado para aprovação. 
-              Em breve você receberá uma notificação sobre o status.
+            <p className="text-muted-foreground mb-4">
+              O cadastro do cliente passará por aprovação.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Status: <span className="font-medium text-warning">Em aprovação</span>
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Você será notificado quando a aprovação for concluída.
             </p>
           </div>
         </DialogContent>
