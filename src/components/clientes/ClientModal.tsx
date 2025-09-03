@@ -161,7 +161,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
   };
 
   const nextStep = () => {
-    if (currentStep < 3) {
+    if (currentStep < 2) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -176,13 +176,6 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
     if (currentStep === 1) {
       const step1Fields = ['nomeFantasia', 'razaoSocial', 'cnpj', 'inscricaoEstadual', 'email', 'telefone', 'cep', 'rua', 'numero', 'bairro', 'cidade', 'uf'];
       return step1Fields.every(field => form.getValues(field as keyof ClientFormData));
-    }
-    if (currentStep === 2) {
-      const faturamentoTerceiros = form.getValues('faturamentoTerceiros');
-      if (faturamentoTerceiros) {
-        return form.getValues('situacaoFaturamento') && form.getValues('empresaFaturamento');
-      }
-      return true;
     }
     return true;
   };
@@ -242,7 +235,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
           </DialogTitle>
           {!cliente && (
             <div className="flex items-center justify-center gap-2 mt-4">
-              {[1, 2, 3].map((step) => (
+              {[1, 2].map((step) => (
                 <div key={step} className="flex items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                     currentStep === step 
@@ -253,7 +246,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                   }`}>
                     {step}
                   </div>
-                  {step < 3 && (
+                  {step < 2 && (
                     <div className={`w-12 h-0.5 ${
                       currentStep > step ? "bg-green-500" : "bg-muted"
                     }`} />
@@ -265,9 +258,8 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
           {!cliente && (
             <div className="text-center mt-2">
               <p className="text-sm text-muted-foreground">
-                {currentStep === 1 && "Etapa 1: Dados do Cliente"}
+                {currentStep === 1 && "Etapa 1: Dados da Empresa"}
                 {currentStep === 2 && "Etapa 2: Faturamento"}
-                {currentStep === 3 && "Etapa 3: Anexos"}
               </p>
             </div>
           )}
@@ -275,10 +267,10 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Etapa 1: Dados do Cliente */}
+            {/* Etapa 1: Dados da Empresa */}
             {(cliente || currentStep === 1) && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Dados do Cliente</h3>
+                <h3 className="text-lg font-semibold">Dados da Empresa</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -479,154 +471,153 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
 
             {/* Etapa 2: Faturamento */}
             {(cliente || currentStep === 2) && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Faturamento</h3>
-                <FormField
-                  control={form.control}
-                  name="faturamentoTerceiros"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>
-                          Faturamento para empresa terceira?
-                        </FormLabel>
-                      </div>
-                    </FormItem>
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Faturamento</h3>
+                  <FormField
+                    control={form.control}
+                    name="faturamentoTerceiros"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>
+                            Faturamento para empresa terceira?
+                          </FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  {watchFaturamentoTerceiros && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="situacaoFaturamento"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Situação de Faturamento Terceiros *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecione a situação" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {situacoesFaturamento.map((situacao) => (
+                                  <SelectItem key={situacao} value={situacao}>
+                                    {situacao}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="empresaFaturamento"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Empresa que será Faturada *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecione a empresa" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {empresasFaturamento.map((empresa) => (
+                                  <SelectItem key={empresa} value={empresa}>
+                                    {empresa}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   )}
-                />
+                </div>
 
-                {watchFaturamentoTerceiros && (
+                {/* Anexos - sempre visíveis na Etapa 2 */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Anexos</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="situacaoFaturamento"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Situação de Faturamento Terceiros *</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione a situação" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {situacoesFaturamento.map((situacao) => (
-                                <SelectItem key={situacao} value={situacao}>
-                                  {situacao}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="empresaFaturamento"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Empresa que será Faturada *</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione a empresa" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {empresasFaturamento.map((empresa) => (
-                                <SelectItem key={empresa} value={empresa}>
-                                  {empresa}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Etapa 3: Anexos */}
-            {(cliente || currentStep === 3) && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Anexos</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {documentTypes.map((docType) => {
-                    const uploadedFile = uploadedFiles[docType.id];
-                    const isRequired = docType.required || 
-                      (docType.id === "autorizacao-terceiros" && watchFaturamentoTerceiros);
-                    
-                    return (
-                      <Card key={docType.id} className="border-border">
-                        <CardHeader className="pb-3">
-                          <CardTitle className="text-sm flex items-center justify-between">
-                            <span className="flex items-center gap-2">
-                              <FileText className="h-4 w-4" />
-                              {docType.name}
-                              {isRequired && <span className="text-destructive">*</span>}
-                            </span>
-                            {uploadedFile && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleRemoveFile(docType.id)}
-                                className="h-6 w-6 p-0 text-destructive hover:text-destructive"
-                              >
-                                <X className="h-3 w-3" />
-                              </Button>
-                            )}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          {uploadedFile ? (
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
-                                <FileText className="h-4 w-4 text-muted-foreground" />
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate">
-                                    {uploadedFile.name}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {formatFileSize(uploadedFile.size)}
-                                  </p>
+                    {documentTypes.map((docType) => {
+                      const uploadedFile = uploadedFiles[docType.id];
+                      const isRequired = docType.required;
+                      
+                      return (
+                        <Card key={docType.id} className="border-border">
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-sm flex items-center justify-between">
+                              <span className="flex items-center gap-2">
+                                <FileText className="h-4 w-4" />
+                                {docType.name}
+                                {isRequired && <span className="text-destructive">*</span>}
+                              </span>
+                              {uploadedFile && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleRemoveFile(docType.id)}
+                                  className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              )}
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            {uploadedFile ? (
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
+                                  <FileText className="h-4 w-4 text-muted-foreground" />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium truncate">
+                                      {uploadedFile.name}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {formatFileSize(uploadedFile.size)}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ) : (
-                            <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors">
-                              <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                              <span className="text-sm text-muted-foreground text-center">
-                                Clique para enviar<br />
-                                ou arraste o arquivo aqui
-                              </span>
-                              <input
-                                type="file"
-                                className="hidden"
-                                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    handleFileUpload(docType.id, file);
-                                  }
-                                }}
-                              />
-                            </label>
-                          )}
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
+                            ) : (
+                              <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors">
+                                <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                                <span className="text-sm text-muted-foreground text-center">
+                                  Clique para enviar<br />
+                                  ou arraste o arquivo aqui
+                                </span>
+                                <input
+                                  type="file"
+                                  className="hidden"
+                                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      handleFileUpload(docType.id, file);
+                                    }
+                                  }}
+                                />
+                              </label>
+                            )}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
@@ -659,7 +650,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                   <Button type="submit">
                     Atualizar
                   </Button>
-                ) : currentStep < 3 ? (
+                ) : currentStep < 2 ? (
                   <Button
                     type="button"
                     onClick={nextStep}
