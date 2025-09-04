@@ -61,7 +61,7 @@ export function AppSidebar() {
                         end={item.url === "/"}
                         >
                       <item.icon />
-                      <span>{item.title}</span>
+                      <span className="font-medium">{item.title}</span>
                       <ChevronRight  />
                     </NavLink>
                   </SidebarMenuButton>
