@@ -225,15 +225,15 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
         <DialogContent className="max-w-md">
           <div className="text-center py-8">
             <CheckCircle className="h-16 w-16 text-success mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Cadastro Enviado!</h3>
+            <h3 className="text-lg font-semibold mb-2">Cadastro Finalizado com Sucesso!</h3>
             <p className="text-muted-foreground mb-4">
-              O cadastro do cliente passará por aprovação.
+              O cadastro do cliente foi finalizado com sucesso e estará passando por aprovação interna.
             </p>
             <p className="text-sm text-muted-foreground">
               Status: <span className="font-medium text-warning">Em aprovação</span>
             </p>
             <p className="text-xs text-muted-foreground mt-2">
-              Você será notificado quando a aprovação for concluída.
+              Você será notificado quando a aprovação interna for concluída.
             </p>
           </div>
         </DialogContent>
