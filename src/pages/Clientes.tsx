@@ -112,7 +112,8 @@ const Clientes = () => {
       email: "contato@reformatotal.com.br",
       telefone: "(11) 66666-5555",
       faturamentoTerceiros: false,
-      status: "Reprovado" as const
+      status: "Reprovado" as const,
+      motivoReprovacao: "CNPJ inválido e documentos de comprovação de endereço não foram enviados. Por favor, corrija o CNPJ e anexe os documentos necessários."
     }
   ]);
 

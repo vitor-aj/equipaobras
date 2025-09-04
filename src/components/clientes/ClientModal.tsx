@@ -27,7 +27,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, FileText, X, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Upload, FileText, X, ArrowLeft, ArrowRight, CheckCircle, AlertCircle, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export interface Cliente {
@@ -48,6 +49,7 @@ export interface Cliente {
   situacaoFaturamento?: string;
   empresaFaturamento?: string;
   status: "Liberado" | "Bloqueado" | "Inativo" | "Em aprovação" | "Análise da IA" | "Análise do Financeiro" | "Aprovado" | "Reprovado";
+  motivoReprovacao?: string;
 }
 
 const clientSchema = z.object({
@@ -170,10 +172,14 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
         onClose();
       }, 2500);
     } else {
+      const wasRejected = cliente?.status === "Reprovado" && data.status === "Em aprovação";
+      
       onSave(clienteData);
       toast({
-        title: "Cliente Atualizado!",
-        description: "As informações do cliente foram atualizadas com sucesso.",
+        title: wasRejected ? "Cadastro Reenviado!" : "Cliente Atualizado!",
+        description: wasRejected 
+          ? "O cadastro foi corrigido e reenviado para aprovação. Você será notificado sobre o novo status."
+          : "As informações do cliente foram atualizadas com sucesso.",
       });
       form.reset();
       setUploadedFiles({});
@@ -258,7 +264,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
-            {cliente ? "Editar Cliente" : "Novo Cliente"}
+            {cliente?.status === "Reprovado" ? "Corrigir Cadastro - Cliente Reprovado" : cliente ? "Editar Cliente" : "Novo Cliente"}
           </DialogTitle>
           {!cliente && (
             <div className="flex items-center justify-center gap-2 mt-4">
@@ -294,6 +300,23 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Motivo da Reprovação */}
+            {cliente?.status === "Reprovado" && cliente.motivoReprovacao && (
+              <Card className="border-destructive/20 bg-destructive/5">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-destructive">Motivo da Reprovação</h4>
+                      <p className="text-sm text-foreground">{cliente.motivoReprovacao}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Corrija as informações abaixo e reenvie para aprovação.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             {/* Etapa 1: Dados da Empresa */}
             {(cliente || currentStep === 1) && (
               <div className="space-y-4">
@@ -708,6 +731,21 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                     }}
                   >
                     Finalizar
+                  </Button>
+                )}
+                
+                {/* Botão especial para clientes reprovados */}
+                {cliente?.status === "Reprovado" && (
+                  <Button 
+                    type="submit" 
+                    className="bg-success hover:bg-success/90"
+                    onClick={() => {
+                      // Muda o status para "Em aprovação" quando reenviar
+                      form.setValue("status", "Em aprovação");
+                    }}
+                  >
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Reenviar para Aprovação
                   </Button>
                 )}
               </div>
