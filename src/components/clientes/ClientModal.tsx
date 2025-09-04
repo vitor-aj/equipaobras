@@ -137,13 +137,17 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
   const watchFaturamentoTerceiros = form.watch("faturamentoTerceiros");
 
   const onSubmit = (data: ClientFormData) => {
+    console.log("onSubmit executado", data);
     const clienteData: Cliente = {
       ...data,
       id: cliente?.id,
       status: cliente ? data.status : "Em aprovação",
     };
     
+    console.log("clienteData criado", clienteData);
+    
     if (!cliente) {
+      console.log("Novo cliente - exibindo sucesso");
       setShowSuccess(true);
       toast({
         title: "Cadastro Enviado!",
@@ -675,7 +679,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 ) : (
-                  <Button type="submit">
+                  <Button type="submit" onClick={() => console.log("Botão Finalizar clicado", form.formState)}>
                     Finalizar
                   </Button>
                 )}
