@@ -70,21 +70,21 @@ const Dashboard = () => {
     }
   ];
 
-  const revenueData = [
-    { month: "Jan", revenue: 145000 },
-    { month: "Fev", revenue: 158000 },
-    { month: "Mar", revenue: 172000 },
-    { month: "Abr", revenue: 165000 },
-    { month: "Mai", revenue: 189000 },
-    { month: "Jun", revenue: 203000 },
-    { month: "Jul", revenue: 195000 },
-    { month: "Ago", revenue: 218000 },
-    { month: "Set", revenue: 235000 }
+  const ordersData = [
+    { month: "Jan", orders: 45 },
+    { month: "Fev", orders: 52 },
+    { month: "Mar", orders: 38 },
+    { month: "Abr", orders: 61 },
+    { month: "Mai", orders: 49 },
+    { month: "Jun", orders: 67 },
+    { month: "Jul", orders: 58 },
+    { month: "Ago", orders: 73 },
+    { month: "Set", orders: 69 }
   ];
 
   const chartConfig = {
-    revenue: {
-      label: "Receita",
+    orders: {
+      label: "Pedidos",
       color: "hsl(var(--primary))"
     }
   };
@@ -154,21 +154,21 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Revenue Chart */}
+        {/* Orders Chart */}
         <Card className="shadow-custom-md border-border">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-primary" />
-              Receita Mensal
+              Pedidos Mensais
             </CardTitle>
             <CardDescription>
-              Evolução da receita nos últimos meses
+              Evolução dos pedidos nos últimos meses
             </CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={revenueData}>
+                <AreaChart data={ordersData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis 
                     dataKey="month" 
@@ -178,18 +178,18 @@ const Dashboard = () => {
                   <YAxis 
                     className="text-muted-foreground"
                     fontSize={12}
-                    tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
+                    tickFormatter={(value) => `${value}`}
                   />
                   <ChartTooltip 
                     content={
                       <ChartTooltipContent 
-                        formatter={(value) => [`R$ ${value.toLocaleString('pt-BR')}`, "Receita"]}
+                        formatter={(value) => [`${value}`, "Pedidos"]}
                       />
                     }
                   />
                   <Area 
                     type="monotone" 
-                    dataKey="revenue" 
+                    dataKey="orders" 
                     stroke="hsl(var(--primary))" 
                     fill="hsl(var(--primary))" 
                     fillOpacity={0.2}
