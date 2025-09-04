@@ -43,7 +43,7 @@ interface Pedido {
   id: string;
   cliente: string;
   valor: string;
-  status: "Em Análise da IA" | "Análise do Faturista" | "Aprovado" | "Devolvido para Ajuste";
+  status: "Concluído" | "Pendente";
   data: string;
   observacoes?: string;
 }
@@ -60,7 +60,7 @@ const Pedidos = () => {
       id: "PED-001",
       cliente: "Construtora ABC Ltda",
       valor: "R$ 45.890,00",
-      status: "Em Análise da IA",
+      status: "Pendente",
       data: "2024-01-15",
       observacoes: "Pedido urgente para obra do shopping"
     },
@@ -68,21 +68,21 @@ const Pedidos = () => {
       id: "PED-002", 
       cliente: "Obras & Cia",
       valor: "R$ 23.450,00",
-      status: "Análise do Faturista",
+      status: "Pendente",
       data: "2024-01-14"
     },
     {
       id: "PED-003",
       cliente: "Edificações Norte",
       valor: "R$ 67.230,00", 
-      status: "Aprovado",
+      status: "Concluído",
       data: "2024-01-13"
     },
     {
       id: "PED-004",
       cliente: "Reformas Sul",
       valor: "R$ 12.670,00",
-      status: "Devolvido para Ajuste",
+      status: "Pendente",
       data: "2024-01-12",
       observacoes: "Documentos em falta: Contrato Social atualizado"
     },
@@ -90,7 +90,7 @@ const Pedidos = () => {
       id: "PED-005",
       cliente: "Construtora ABC Ltda", 
       valor: "R$ 89.450,00",
-      status: "Aprovado",
+      status: "Concluído",
       data: "2024-01-10"
     }
   ]);
@@ -104,10 +104,8 @@ const Pedidos = () => {
 
   const getStatusBadge = (status: Pedido["status"]) => {
     const variants = {
-      "Em Análise da IA": { variant: "secondary" as const, icon: Clock, className: "bg-blue-500/10 text-blue-700 border-blue-500/20" },
-      "Análise do Faturista": { variant: "destructive" as const, icon: AlertTriangle, className: "bg-orange-500/10 text-orange-700 border-orange-500/20" },
-      "Aprovado": { variant: "default" as const, icon: CheckCircle, className: "bg-success/10 text-success border-success/20" },
-      "Devolvido para Ajuste": { variant: "destructive" as const, icon: XCircle, className: "bg-destructive/10 text-destructive border-destructive/20" }
+      "Pendente": { variant: "secondary" as const, icon: Clock, className: "bg-orange-500/10 text-orange-700 border-orange-500/20" },
+      "Concluído": { variant: "default" as const, icon: CheckCircle, className: "bg-success/10 text-success border-success/20" }
     };
     
     const config = variants[status];
@@ -141,7 +139,7 @@ const Pedidos = () => {
       id: `PED-${String(Date.now()).slice(-3)}`,
       cliente: data.cliente,
       valor: data.valor,
-      status: "Em Análise da IA",
+      status: "Pendente",
       data: new Date().toISOString().split('T')[0],
       observacoes: data.observacoes || undefined
     };
@@ -151,10 +149,8 @@ const Pedidos = () => {
 
   const statusCounts = {
     total: pedidos.length,
-    analiseIA: pedidos.filter(p => p.status === "Em Análise da IA").length,
-    analiseFaturista: pedidos.filter(p => p.status === "Análise do Faturista").length,
-    aprovados: pedidos.filter(p => p.status === "Aprovado").length,
-    devolvidos: pedidos.filter(p => p.status === "Devolvido para Ajuste").length
+    pendentes: pedidos.filter(p => p.status === "Pendente").length,
+    concluidos: pedidos.filter(p => p.status === "Concluído").length
   };
 
   return (
@@ -177,7 +173,7 @@ const Pedidos = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="shadow-custom-md border-border gradient-card">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
@@ -193,22 +189,10 @@ const Pedidos = () => {
         <Card className="shadow-custom-md border-border gradient-card">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Clock className="h-8 w-8 text-blue-600" />
+              <Clock className="h-8 w-8 text-orange-600" />
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase">Análise IA</p>
-                <p className="text-xl font-bold text-foreground">{statusCounts.analiseIA}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-custom-md border-border gradient-card">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-8 w-8 text-orange-600" />
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase">Faturista</p>
-                <p className="text-xl font-bold text-foreground">{statusCounts.analiseFaturista}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Pendentes</p>
+                <p className="text-xl font-bold text-foreground">{statusCounts.pendentes}</p>
               </div>
             </div>
           </CardContent>
@@ -219,20 +203,8 @@ const Pedidos = () => {
             <div className="flex items-center gap-2">
               <CheckCircle className="h-8 w-8 text-green-600" />
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase">Aprovados</p>
-                <p className="text-xl font-bold text-foreground">{statusCounts.aprovados}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-custom-md border-border gradient-card">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <XCircle className="h-8 w-8 text-red-600" />
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase">Devolvidos</p>
-                <p className="text-xl font-bold text-foreground">{statusCounts.devolvidos}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Concluídos</p>
+                <p className="text-xl font-bold text-foreground">{statusCounts.concluidos}</p>
               </div>
             </div>
           </CardContent>
@@ -261,10 +233,8 @@ const Pedidos = () => {
                 className="h-11 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="todos">Todos os Status</option>
-                <option value="Em Análise da IA">Em Análise da IA</option>
-                <option value="Análise do Faturista">Análise do Faturista</option>
-                <option value="Aprovado">Aprovados</option>
-                <option value="Devolvido para Ajuste">Devolvidos</option>
+                <option value="Pendente">Pendentes</option>
+                <option value="Concluído">Concluídos</option>
               </select>
             </div>
           </div>

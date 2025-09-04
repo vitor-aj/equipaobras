@@ -17,21 +17,15 @@ export function WorkflowStatus({ currentStep, hasError, errorMessage }: Workflow
   const steps: WorkflowStep[] = [
     {
       id: 1,
-      title: "Análise da IA",
-      description: "Validação automática dos documentos",
-      status: currentStep > 1 ? "completed" : currentStep === 1 ? (hasError ? "error" : "current") : "pending"
+      title: "Pendente",
+      description: "Aguardando processamento",
+      status: currentStep > 1 ? "completed" : currentStep === 1 ? "current" : "pending"
     },
     {
       id: 2,
-      title: "Análise do Faturista",
-      description: "Revisão humana e aprovação",
-      status: currentStep > 2 ? "completed" : currentStep === 2 ? (hasError ? "error" : "current") : "pending"
-    },
-    {
-      id: 3,
-      title: "Pedido Finalizado",
-      description: "Aprovado e pronto para faturamento",
-      status: currentStep === 3 ? "completed" : "pending"
+      title: "Concluído",
+      description: "Pedido finalizado",
+      status: currentStep === 2 ? "completed" : "pending"
     }
   ];
 
@@ -84,7 +78,7 @@ export function WorkflowStatus({ currentStep, hasError, errorMessage }: Workflow
         </h3>
         
         <div className="text-sm text-muted-foreground">
-          Etapa {Math.min(currentStep, 3)} de 3
+          Etapa {Math.min(currentStep, 2)} de 2
         </div>
       </div>
 
@@ -128,7 +122,7 @@ export function WorkflowStatus({ currentStep, hasError, errorMessage }: Workflow
                     transition-all duration-300
                     ${getConnectorColor(index)}
                   `}
-                  style={{ width: 'calc(100vw / 3 - 4rem)' }}
+                  style={{ width: 'calc(100vw / 2 - 4rem)' }}
                 />
               )}
             </div>
@@ -139,37 +133,19 @@ export function WorkflowStatus({ currentStep, hasError, errorMessage }: Workflow
         <div className="absolute top-8 left-8 right-8 h-1 bg-border -z-20 rounded-full" />
       </div>
 
-      {/* Error Message */}
-      {hasError && errorMessage && (
-        <div className="mt-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <XCircle className="h-4 w-4 text-destructive" />
-            <span className="text-sm font-medium text-destructive">
-              Pedido Devolvido para Ajuste
-            </span>
-          </div>
-          <p className="text-sm text-foreground">
-            {errorMessage}
-          </p>
-        </div>
-      )}
-
       {/* Current Step Details */}
-      {!hasError && (
-        <div className="p-4 bg-card/50 border border-border rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <Clock className="h-4 w-4 text-warning" />
-            <span className="text-sm font-medium text-foreground">
-              Status Atual
-            </span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {currentStep === 1 && "Documentos sendo analisados pela IA para validação automática."}
-            {currentStep === 2 && "Aguardando revisão e aprovação do faturista responsável."}
-            {currentStep === 3 && "Pedido aprovado e pronto para processamento de faturamento."}
-          </p>
+      <div className="p-4 bg-card/50 border border-border rounded-lg">
+        <div className="flex items-center gap-2 mb-2">
+          <Clock className="h-4 w-4 text-warning" />
+          <span className="text-sm font-medium text-foreground">
+            Status Atual
+          </span>
         </div>
-      )}
+        <p className="text-sm text-muted-foreground">
+          {currentStep === 1 && "Pedido aguardando processamento e análise."}
+          {currentStep === 2 && "Pedido foi concluído com sucesso."}
+        </p>
+      </div>
     </div>
   );
 }

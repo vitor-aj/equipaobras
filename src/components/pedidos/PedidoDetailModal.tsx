@@ -20,7 +20,7 @@ interface PedidoDetailModalProps {
     id: string;
     cliente: string;
     valor: string;
-    status: "Em Análise da IA" | "Análise do Faturista" | "Aprovado" | "Devolvido para Ajuste";
+    status: "Concluído" | "Pendente";
     data: string;
     observacoes?: string;
   } | null;
@@ -31,19 +31,17 @@ export function PedidoDetailModal({ isOpen, onClose, pedido }: PedidoDetailModal
 
   const getCurrentStep = () => {
     switch (pedido.status) {
-      case "Em Análise da IA":
+      case "Pendente":
         return 1;
-      case "Análise do Faturista":
+      case "Concluído":
         return 2;
-      case "Aprovado":
-        return 3;
       default:
         return 1;
     }
   };
 
-  const hasError = pedido.status === "Devolvido para Ajuste";
-  const errorMessage = hasError ? pedido.observacoes || "Documentos precisam ser revisados" : undefined;
+  const hasError = false;
+  const errorMessage = undefined;
 
   const documents = [
     "Ficha Cadastral",
@@ -171,11 +169,6 @@ export function PedidoDetailModal({ isOpen, onClose, pedido }: PedidoDetailModal
             <Button onClick={onClose} className="flex-1">
               Fechar
             </Button>
-            {hasError && (
-              <Button variant="outline" className="flex-1">
-                Editar Pedido
-              </Button>
-            )}
           </div>
         </div>
       </DialogContent>
