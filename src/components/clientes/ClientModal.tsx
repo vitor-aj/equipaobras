@@ -143,14 +143,13 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
     
     // Só processa o submit na etapa 2 (ou se for edição de cliente existente)
     if (!cliente && currentStep === 1) {
-      console.log("Impedindo submit na etapa 1 - indo para próxima etapa");
-      nextStep();
-      return;
+      console.log("Impedindo submit na etapa 1");
+      return; // Não faz nada, o botão "Próximo" cuida da navegação
     }
     
     const clienteData: Cliente = {
       ...data,
-      id: cliente?.id,
+      id: cliente?.id || Date.now().toString(),
       status: cliente ? data.status : "Em aprovação",
     };
     
@@ -714,22 +713,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 ) : (
-                  <Button 
-                    type="submit" 
-                    onClick={() => {
-                      console.log("Botão Finalizar clicado", form.formState);
-                      console.log("Erros de validação:", form.formState.errors);
-                      console.log("Valores atuais:", form.getValues());
-                      
-                      // Força a validação de todos os campos
-                      form.trigger().then((isValid) => {
-                        console.log("Formulário válido?", isValid);
-                        if (!isValid) {
-                          console.log("Erros após trigger:", form.formState.errors);
-                        }
-                      });
-                    }}
-                  >
+                  <Button type="submit">
                     Finalizar
                   </Button>
                 )}
