@@ -679,7 +679,22 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 ) : (
-                  <Button type="submit" onClick={() => console.log("Botão Finalizar clicado", form.formState)}>
+                  <Button 
+                    type="submit" 
+                    onClick={() => {
+                      console.log("Botão Finalizar clicado", form.formState);
+                      console.log("Erros de validação:", form.formState.errors);
+                      console.log("Valores atuais:", form.getValues());
+                      
+                      // Força a validação de todos os campos
+                      form.trigger().then((isValid) => {
+                        console.log("Formulário válido?", isValid);
+                        if (!isValid) {
+                          console.log("Erros após trigger:", form.formState.errors);
+                        }
+                      });
+                    }}
+                  >
                     Finalizar
                   </Button>
                 )}
