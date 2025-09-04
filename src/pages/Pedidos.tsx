@@ -156,9 +156,9 @@ const Pedidos = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             Gestão de Pedidos
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -166,14 +166,14 @@ const Pedidos = () => {
           </p>
         </div>
         
-        <Button className="flex items-center gap-2 shadow-custom-md" onClick={() => setIsNovoPedidoModalOpen(true)}>
+        <Button className="flex items-center gap-2 shadow-custom-md w-full sm:w-auto" onClick={() => setIsNovoPedidoModalOpen(true)}>
           <Plus className="h-4 w-4" />
           Novo Pedido
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="shadow-custom-md border-border gradient-card">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
@@ -214,7 +214,7 @@ const Pedidos = () => {
       {/* Filters */}
       <Card className="shadow-custom-md border-border">
         <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -230,7 +230,7 @@ const Pedidos = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="h-11 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                className="h-11 px-3 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring w-full sm:w-auto"
               >
                 <option value="todos">Todos os Status</option>
                 <option value="Pendente">Pendentes</option>
@@ -241,8 +241,8 @@ const Pedidos = () => {
         </CardContent>
       </Card>
 
-      {/* Tabela de Pedidos */}
-      <Card className="shadow-custom-md border-border">
+      {/* Tabela de Pedidos - Desktop */}
+      <Card className="shadow-custom-md border-border hidden lg:block">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
@@ -332,6 +332,97 @@ const Pedidos = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Pedidos Cards - Mobile */}
+      <div className="space-y-4 lg:hidden">
+        {filteredPedidos.map((pedido) => (
+          <Card key={pedido.id} className="shadow-custom-md border-border">
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <FileText className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-foreground">{pedido.id}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(pedido.data).toLocaleDateString('pt-BR')}
+                    </p>
+                  </div>
+                </div>
+                {getStatusBadge(pedido.status)}
+              </div>
+              
+              <div className="space-y-2 mb-4">
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium">Cliente:</span> {pedido.cliente}
+                </p>
+                <p className="text-lg font-semibold text-foreground">
+                  {pedido.valor}
+                </p>
+                {pedido.observacoes && (
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-medium">Observações:</span> {pedido.observacoes}
+                  </p>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => {
+                    setSelectedPedido(pedido);
+                    setIsDetailModalOpen(true);
+                  }}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Ver Detalhes
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => handleEditPedido(pedido)}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Editar
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="px-3 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="mx-4 max-w-md">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Tem certeza que deseja excluir o pedido "{pedido.id}"? 
+                        Esta ação não pode ser desfeita.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                      <AlertDialogCancel className="w-full sm:w-auto">Cancelar</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={() => handleDeletePedido(pedido.id)}
+                        className="w-full sm:w-auto bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Excluir
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       {filteredPedidos.length === 0 && (
         <div className="text-center py-12">

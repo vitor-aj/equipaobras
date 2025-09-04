@@ -126,9 +126,9 @@ const Financeiro = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             Aprovação de Clientes
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -145,7 +145,7 @@ const Financeiro = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="shadow-custom-md border-border gradient-card">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
@@ -202,33 +202,35 @@ const Financeiro = () => {
       <div className="space-y-4">
         {filteredClientes.map((cliente) => (
           <Card key={cliente.id} className="shadow-custom-md border-border hover:shadow-custom-lg transition-fast gradient-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 flex-1">
-                  <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Building2 className="h-6 w-6 text-blue-600" />
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                  <div className="h-10 w-10 sm:h-12 sm:w-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Building2 className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-foreground">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground truncate">
                         {cliente.nomeFantasia}
                       </h3>
-                      <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                        {cliente.id}
-                      </Badge>
-                      {cliente.analiseIA.status === "aprovado" && (
-                        <Badge className="bg-green-100 text-green-800 border-green-200">
-                          IA Aprovada
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs">
+                          {cliente.id}
                         </Badge>
-                      )}
+                        {cliente.analiseIA.status === "aprovado" && (
+                          <Badge className="bg-green-100 text-green-800 border-green-200 text-xs">
+                            IA Aprovada
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     
-                    <p className="text-sm text-muted-foreground mb-2">
+                    <p className="text-sm text-muted-foreground mb-2 truncate">
                       {cliente.cnpj} • {cliente.razaoSocial}
                     </p>
                     
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
                         Cadastro: {new Date(cliente.dataCadastro).toLocaleDateString('pt-BR')}
@@ -243,11 +245,11 @@ const Financeiro = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2 ml-4">
+                <div className="flex items-center gap-2">
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 w-full sm:w-auto"
                     onClick={() => {
                       setSelectedCliente(cliente);
                       setShowClientModal(true);

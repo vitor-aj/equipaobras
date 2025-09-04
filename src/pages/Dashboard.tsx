@@ -93,9 +93,9 @@ const Dashboard = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             Dashboard
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -105,7 +105,7 @@ const Dashboard = () => {
         
         <div className="flex items-center gap-2 text-muted-foreground">
           <TrendingUp className="h-4 w-4" />
-          <span className="text-sm">Atualizado há 5 minutos</span>
+          <span className="text-xs sm:text-sm">Atualizado há 5 minutos</span>
         </div>
       </div>
 
@@ -116,7 +116,7 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
         {/* Últimos Pedidos */}
         <Card className="shadow-custom-md border-border">
           <CardHeader className="pb-4">

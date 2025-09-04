@@ -175,9 +175,9 @@ const Clientes = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             Gestão de Clientes
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -186,19 +186,19 @@ const Clientes = () => {
         </div>
         
         <Button 
-          className="flex items-center gap-2 shadow-custom-md"
+          className="flex items-center gap-2 shadow-custom-md w-full sm:w-auto"
           onClick={() => {
             setEditingCliente(null);
             setIsModalOpen(true);
           }}
         >
           <Plus className="h-4 w-4" />
-          Novo Cliente
+          <span className="sm:inline">Novo Cliente</span>
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
         <Card className="shadow-custom-md border-border gradient-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
@@ -269,8 +269,8 @@ const Clientes = () => {
         </CardContent>
       </Card>
 
-      {/* Clients Table */}
-      <Card className="shadow-custom-md border-border">
+      {/* Clients Table - Desktop */}
+      <Card className="shadow-custom-md border-border hidden lg:block">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
@@ -359,6 +359,89 @@ const Clientes = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Clients Cards - Mobile */}
+      <div className="space-y-4 lg:hidden">
+        {filteredClientes.map((cliente) => (
+          <Card key={cliente.id} className="shadow-custom-md border-border">
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Building className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-foreground truncate">{cliente.nomeFantasia}</h3>
+                    <p className="text-sm text-muted-foreground truncate">{cliente.email}</p>
+                  </div>
+                </div>
+                {getStatusBadge(cliente.status)}
+              </div>
+              
+              <div className="space-y-2 mb-4">
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium">Razão Social:</span> {cliente.razaoSocial}
+                </p>
+                <p className="text-sm text-muted-foreground font-mono">
+                  <span className="font-medium font-sans">CNPJ:</span> {cliente.cnpj}
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                {cliente.status === "Reprovado" && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1 text-blue-600 hover:text-blue-600 hover:bg-blue-50"
+                    onClick={() => handleEditCliente(cliente)}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    Visualizar
+                  </Button>
+                )}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => handleEditCliente(cliente)}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Editar
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="px-3 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="mx-4 max-w-md">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Tem certeza que deseja excluir o cliente "{cliente.nomeFantasia}"? 
+                        Esta ação não pode ser desfeita.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                      <AlertDialogCancel className="w-full sm:w-auto">Cancelar</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={() => handleDeleteCliente(cliente.id!)}
+                        className="w-full sm:w-auto bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Excluir
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       {filteredClientes.length === 0 && searchTerm && (
         <div className="text-center py-12">

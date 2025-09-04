@@ -95,7 +95,7 @@ export default function Configuracoes() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         {/* Informações do Perfil */}
         <div className="lg:col-span-2">
           <Card>
@@ -139,7 +139,7 @@ export default function Configuracoes() {
               <Separator />
 
               {/* Campos do Formulário */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="nome">Nome Completo</Label>
                   <div className="relative">
@@ -168,7 +168,7 @@ export default function Configuracoes() {
                   </div>
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="email">E-mail</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
