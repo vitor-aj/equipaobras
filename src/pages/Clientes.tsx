@@ -32,7 +32,10 @@ import {
   Mail, 
   CheckCircle,
   XCircle,
-  MinusCircle
+  MinusCircle,
+  Clock,
+  Eye,
+  AlertTriangle
 } from "lucide-react";
 import { ClientModal, Cliente } from "@/components/clientes/ClientModal";
 
@@ -56,7 +59,7 @@ const Clientes = () => {
       email: "contato@abcconstrutora.com.br",
       telefone: "(11) 99999-8888",
       faturamentoTerceiros: false,
-      status: "Liberado" as const
+      status: "Aprovado" as const
     },
     {
       id: "2", 
@@ -75,7 +78,7 @@ const Clientes = () => {
       faturamentoTerceiros: true,
       situacaoFaturamento: "Contrato entre as duas empresas",
       empresaFaturamento: "Empresa A Ltda",
-      status: "Liberado" as const
+      status: "Análise do Financeiro" as const
     },
     {
       id: "3",
@@ -92,7 +95,7 @@ const Clientes = () => {
       email: "contato@edificacoesnorte.com",
       telefone: "(11) 77777-6666",
       faturamentoTerceiros: false,
-      status: "Bloqueado" as const
+      status: "Análise da IA" as const
     },
     {
       id: "4",
@@ -109,7 +112,7 @@ const Clientes = () => {
       email: "contato@reformatotal.com.br",
       telefone: "(11) 66666-5555",
       faturamentoTerceiros: false,
-      status: "Inativo" as const
+      status: "Reprovado" as const
     }
   ]);
 
@@ -144,9 +147,13 @@ const Clientes = () => {
 
   const getStatusBadge = (status: Cliente["status"]) => {
     const variants = {
-      Liberado: { variant: "default" as const, icon: CheckCircle, className: "bg-success/10 text-success border-success/20" },
-      Bloqueado: { variant: "destructive" as const, icon: XCircle, className: "bg-destructive/10 text-destructive border-destructive/20" },
-      Inativo: { variant: "secondary" as const, icon: MinusCircle, className: "bg-muted text-muted-foreground" },
+      "Análise da IA": { variant: "secondary" as const, icon: Clock, className: "bg-blue-50 text-blue-700 border-blue-200" },
+      "Análise do Financeiro": { variant: "secondary" as const, icon: AlertTriangle, className: "bg-orange-50 text-orange-700 border-orange-200" },
+      "Aprovado": { variant: "default" as const, icon: CheckCircle, className: "bg-success/10 text-success border-success/20" },
+      "Reprovado": { variant: "destructive" as const, icon: XCircle, className: "bg-destructive/10 text-destructive border-destructive/20" },
+      "Liberado": { variant: "default" as const, icon: CheckCircle, className: "bg-success/10 text-success border-success/20" },
+      "Bloqueado": { variant: "destructive" as const, icon: XCircle, className: "bg-destructive/10 text-destructive border-destructive/20" },
+      "Inativo": { variant: "secondary" as const, icon: MinusCircle, className: "bg-muted text-muted-foreground" },
       "Em aprovação": { variant: "secondary" as const, icon: MinusCircle, className: "bg-warning/10 text-warning border-warning/20" }
     };
     
@@ -161,8 +168,9 @@ const Clientes = () => {
     );
   };
 
-  const activeClientes = clientes.filter(c => c.status === "Liberado").length;
-  const newClientes = Math.floor(clientes.length * 0.3); // Mock data
+  const clientesAnaliseIA = clientes.filter(c => c.status === "Análise da IA").length;
+  const clientesAnaliseFinanceiro = clientes.filter(c => c.status === "Análise do Financeiro").length;
+  const clientesAprovados = clientes.filter(c => c.status === "Aprovado").length;
 
   return (
     <div className="space-y-8">
@@ -194,15 +202,33 @@ const Clientes = () => {
         <Card className="shadow-custom-md border-border gradient-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                <Users className="h-6 w-6 text-primary" />
+              <div className="h-12 w-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                <Clock className="h-6 w-6 text-blue-600" />
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  Total de Clientes
+                  Análise da IA
                 </p>
                 <h3 className="text-2xl font-bold text-foreground mt-1">
-                  {clientes.length}
+                  {clientesAnaliseIA}
+                </h3>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-custom-md border-border gradient-card">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 bg-orange-500/10 rounded-xl flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-orange-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  Análise do Financeiro
+                </p>
+                <h3 className="text-2xl font-bold text-foreground mt-1">
+                  {clientesAnaliseFinanceiro}
                 </h3>
               </div>
             </div>
@@ -213,32 +239,14 @@ const Clientes = () => {
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 bg-success/10 rounded-xl flex items-center justify-center">
-                <Building className="h-6 w-6 text-success" />
+                <CheckCircle className="h-6 w-6 text-success" />
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  Clientes Liberados
+                  Clientes Aprovados
                 </p>
                 <h3 className="text-2xl font-bold text-foreground mt-1">
-                  {activeClientes}
-                </h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-custom-md border-border gradient-card">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 bg-warning/10 rounded-xl flex items-center justify-center">
-                <Mail className="h-6 w-6 text-warning" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  Novos Este Mês
-                </p>
-                <h3 className="text-2xl font-bold text-foreground mt-1">
-                  {newClientes}
+                  {clientesAprovados}
                 </h3>
               </div>
             </div>
@@ -295,6 +303,17 @@ const Clientes = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-2">
+                      {cliente.status === "Reprovado" && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-600 hover:bg-blue-50"
+                          onClick={() => handleEditCliente(cliente)}
+                          title="Visualizar detalhes e corrigir"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      )}
                       <Button 
                         variant="ghost" 
                         size="sm" 

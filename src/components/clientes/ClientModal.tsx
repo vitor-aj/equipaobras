@@ -47,7 +47,7 @@ export interface Cliente {
   faturamentoTerceiros: boolean;
   situacaoFaturamento?: string;
   empresaFaturamento?: string;
-  status: "Liberado" | "Bloqueado" | "Inativo" | "Em aprovação";
+  status: "Liberado" | "Bloqueado" | "Inativo" | "Em aprovação" | "Análise da IA" | "Análise do Financeiro" | "Aprovado" | "Reprovado";
 }
 
 const clientSchema = z.object({
@@ -66,7 +66,7 @@ const clientSchema = z.object({
   faturamentoTerceiros: z.boolean(),
   situacaoFaturamento: z.string().optional(),
   empresaFaturamento: z.string().optional(),
-  status: z.enum(["Liberado", "Bloqueado", "Inativo", "Em aprovação"]),
+  status: z.enum(["Liberado", "Bloqueado", "Inativo", "Em aprovação", "Análise da IA", "Análise do Financeiro", "Aprovado", "Reprovado"]),
 });
 
 type ClientFormData = z.infer<typeof clientSchema>;
@@ -485,6 +485,10 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                               <SelectItem value="Bloqueado">Bloqueado</SelectItem>
                               <SelectItem value="Inativo">Inativo</SelectItem>
                               <SelectItem value="Em aprovação">Em aprovação</SelectItem>
+                              <SelectItem value="Análise da IA">Análise da IA</SelectItem>
+                              <SelectItem value="Análise do Financeiro">Análise do Financeiro</SelectItem>
+                              <SelectItem value="Aprovado">Aprovado</SelectItem>
+                              <SelectItem value="Reprovado">Reprovado</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
