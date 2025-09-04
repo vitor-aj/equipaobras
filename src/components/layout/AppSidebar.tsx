@@ -24,7 +24,11 @@ const menuItems = [{
   url: "/configuracoes",
   icon: Settings
 }];
-export function AppSidebar() {
+interface AppSidebarProps {
+  onLogout?: () => void;
+}
+
+export function AppSidebar({ onLogout }: AppSidebarProps) {
   const location = useLocation();
   const currentPath = location.pathname;
   const { toast } = useToast();
@@ -34,11 +38,13 @@ export function AppSidebar() {
   };
 
   const handleLogout = () => {
+    if (onLogout) {
+      onLogout();
+    }
     toast({
       title: "Logout realizado",
       description: "Você foi desconectado com sucesso.",
     });
-    // Aqui você adicionaria a lógica real de logout quando integrar com backend
   };
   return <Sidebar className="w-64 border-r border-border">
       <SidebarContent className="bg-sidebar">
