@@ -59,13 +59,6 @@ export function AppSidebar() {
                       <NavLink
                         to={item.url}
                         end={item.url === "/"}
-                        className={({ isActive: navActive }) =>
-                          `flex items-center gap-3 px-3 py-3 rounded-lg transition-fast group ${
-                            navActive || isActive(item.url)
-                              ? "bg-primary text-primary-foreground shadow-custom-sm"
-                              : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                          }`
-                        }
                       >
                       <item.icon />
                       <span className="font-medium">{item.title}</span>
