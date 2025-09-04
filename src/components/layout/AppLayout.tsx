@@ -6,14 +6,13 @@ import { Input } from "@/components/ui/input";
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  onLogout?: () => void;
 }
 
-export function AppLayout({ children, onLogout }: AppLayoutProps) {
+export function AppLayout({ children }: AppLayoutProps) {
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
-        <AppSidebar onLogout={onLogout} />
+        <AppSidebar />
         
         <div className="flex-1 flex flex-col">
           {/* Header */}
@@ -34,9 +33,6 @@ export function AppLayout({ children, onLogout }: AppLayoutProps) {
               </div>
 
               <div className="flex items-center gap-3">
-                <Button variant="ghost" size="sm" className="p-2">
-                  <Bell className="h-4 w-4" />
-                </Button>
                 
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="sm" className="flex items-center gap-2">
