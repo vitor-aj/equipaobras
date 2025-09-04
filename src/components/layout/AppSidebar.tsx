@@ -58,7 +58,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} end={item.url === "/"} className="bg-primary text-primary-foreground"
                       <item.icon className="h-5 w-5 flex-shrink-0" />
-                      <span className="font-medium">{item.title}</span>
+                      <span className="font-medium text-red">{item.title}</span>
                       <ChevronRight className="h-4 w-4 ml-auto opacity-0 group-hover:opacity-100 transition-fast" />
                     </NavLink>
                   </SidebarMenuButton>
