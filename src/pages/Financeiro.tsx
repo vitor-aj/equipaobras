@@ -18,30 +18,30 @@ import {
   Calendar
 } from "lucide-react";
 
-interface PedidoFaturista {
+interface PedidoFinanceiro {
   id: string;
   cliente: string;
   valor: string;
-  status: "Análise do Faturista" | "Aprovado" | "Devolvido para Ajuste";
+  status: "Análise do Financeiro" | "Aprovado" | "Devolvido para Ajuste";
   data: string;
   observacoes?: string;
   prioridade: "alta" | "normal" | "baixa";
   tempoAnalise?: string;
 }
 
-const Faturista = () => {
+const Financeiro = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedPedido, setSelectedPedido] = useState<PedidoFaturista | null>(null);
+  const [selectedPedido, setSelectedPedido] = useState<PedidoFinanceiro | null>(null);
   const [actionType, setActionType] = useState<"aprovar" | "devolver" | null>(null);
   const [observacoes, setObservacoes] = useState("");
 
   // Mock data - seria conectado ao banco via Supabase
-  const pedidos: PedidoFaturista[] = [
+  const pedidos: PedidoFinanceiro[] = [
     {
       id: "PED-001",
       cliente: "Construtora ABC Ltda",
       valor: "R$ 45.890,00",
-      status: "Análise do Faturista",
+      status: "Análise do Financeiro",
       data: "2024-01-15",
       prioridade: "alta",
       tempoAnalise: "2h 30min",
@@ -51,7 +51,7 @@ const Faturista = () => {
       id: "PED-002", 
       cliente: "Obras & Cia",
       valor: "R$ 23.450,00",
-      status: "Análise do Faturista",
+      status: "Análise do Financeiro",
       data: "2024-01-14",
       prioridade: "normal",
       tempoAnalise: "1h 45min"
@@ -60,7 +60,7 @@ const Faturista = () => {
       id: "PED-006",
       cliente: "Construtora Norte",
       valor: "R$ 78.900,00",
-      status: "Análise do Faturista", 
+      status: "Análise do Financeiro", 
       data: "2024-01-16",
       prioridade: "alta",
       tempoAnalise: "30min"
@@ -69,7 +69,7 @@ const Faturista = () => {
       id: "PED-007",
       cliente: "Reformas Express",
       valor: "R$ 15.600,00",
-      status: "Análise do Faturista",
+      status: "Análise do Financeiro",
       data: "2024-01-13",
       prioridade: "baixa",
       tempoAnalise: "4h 15min"
@@ -77,7 +77,7 @@ const Faturista = () => {
   ];
 
   const filteredPedidos = pedidos.filter(pedido => 
-    pedido.status === "Análise do Faturista" &&
+    pedido.status === "Análise do Financeiro" &&
     (pedido.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
      pedido.cliente.toLowerCase().includes(searchTerm.toLowerCase()))
   );
@@ -95,10 +95,10 @@ const Faturista = () => {
     }
   };
 
-  const handleAction = (pedido: PedidoFaturista, type: "aprovar" | "devolver") => {
+  const handleAction = (pedido: PedidoFinanceiro, type: "aprovar" | "devolver") => {
     setSelectedPedido(pedido);
     setActionType(type);
-    setObservacoes(type === "devolver" ? "" : "Pedido aprovado pelo faturista");
+    setObservacoes(type === "devolver" ? "" : "Pedido aprovado pelo financeiro");
   };
 
   const confirmarAcao = () => {
@@ -129,10 +129,10 @@ const Faturista = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">
-            Análise de Faturista
+            Análise do Financeiro
           </h1>
           <p className="text-muted-foreground mt-1">
-            Revisar e aprovar pedidos validados pela IA
+            Revisar e aprovar pedidos para faturamento
           </p>
         </div>
         
@@ -360,4 +360,4 @@ const Faturista = () => {
   );
 };
 
-export default Faturista;
+export default Financeiro;

@@ -14,8 +14,8 @@ const menuItems = [{
   url: "/pedidos",
   icon: FileText
 }, {
-  title: "Faturista",
-  url: "/faturista",
+  title: "Financeiro",
+  url: "/financeiro",
   icon: UserCheck
 }, {
   title: "Configurações",

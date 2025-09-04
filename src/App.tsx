@@ -9,7 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Clientes from "./pages/Clientes";
 import Pedidos from "./pages/Pedidos";
 import NovoPedido from "./pages/NovoPedido";
-import Faturista from "./pages/Faturista";
+import Financeiro from "./pages/Financeiro";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,9 +41,9 @@ const App = () => (
               <NovoPedido />
             </AppLayout>
           } />
-          <Route path="/faturista" element={
+          <Route path="/financeiro" element={
             <AppLayout>
-              <Faturista />
+              <Financeiro />
             </AppLayout>
           } />
           <Route path="/configuracoes" element={
