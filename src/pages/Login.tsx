@@ -53,7 +53,7 @@ const Login = () => {
       });
       
       // Redirecionar para dashboard
-      navigate("/");
+      window.location.href = "/";
       setIsLoading(false);
     }, 1000);
   };
