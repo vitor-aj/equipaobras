@@ -166,7 +166,7 @@ const Dashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[200px]">
+            <ChartContainer config={chartConfig} className="h-[350px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={ordersData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />

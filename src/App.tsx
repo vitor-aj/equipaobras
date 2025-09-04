@@ -77,32 +77,32 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={
-              <AppLayout onLogout={handleLogout}>
+              <AppLayout>
                 <Dashboard />
               </AppLayout>
             } />
             <Route path="/clientes" element={
-              <AppLayout onLogout={handleLogout}>
+              <AppLayout>
                 <Clientes />
               </AppLayout>
             } />
             <Route path="/pedidos" element={
-              <AppLayout onLogout={handleLogout}>
+              <AppLayout>
                 <Pedidos />
               </AppLayout>
             } />
             <Route path="/pedidos/novo" element={
-              <AppLayout onLogout={handleLogout}>
+              <AppLayout>
                 <NovoPedido />
               </AppLayout>
             } />
             <Route path="/financeiro" element={
-              <AppLayout onLogout={handleLogout}>
+              <AppLayout>
                 <Financeiro />
               </AppLayout>
             } />
             <Route path="/configuracoes" element={
-              <AppLayout onLogout={handleLogout}>
+              <AppLayout>
                 <Configuracoes />
               </AppLayout>
             } />
