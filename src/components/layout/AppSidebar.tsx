@@ -1,6 +1,8 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, FileText, Settings, Building2, ChevronRight, UserCheck } from "lucide-react";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
+import { LayoutDashboard, Users, FileText, Settings, Building2, ChevronRight, UserCheck, LogOut } from "lucide-react";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarFooter } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 const menuItems = [{
   title: "Dashboard",
   url: "/",
@@ -25,9 +27,18 @@ const menuItems = [{
 export function AppSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
+  const { toast } = useToast();
   const isActive = (path: string) => {
     if (path === "/" && currentPath === "/") return true;
     return path !== "/" && currentPath.startsWith(path);
+  };
+
+  const handleLogout = () => {
+    toast({
+      title: "Logout realizado",
+      description: "Você foi desconectado com sucesso.",
+    });
+    // Aqui você adicionaria a lógica real de logout quando integrar com backend
   };
   return <Sidebar className="w-64 border-r border-border">
       <SidebarContent className="bg-sidebar">
@@ -70,5 +81,17 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      {/* Footer com botão de logout */}
+      <SidebarFooter className="p-4 border-t border-sidebar-border">
+        <Button 
+          variant="ghost" 
+          onClick={handleLogout}
+          className="w-full justify-start text-muted-foreground hover:text-foreground"
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          Sair
+        </Button>
+      </SidebarFooter>
     </Sidebar>;
 }

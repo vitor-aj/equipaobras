@@ -10,6 +10,7 @@ import Clientes from "./pages/Clientes";
 import Pedidos from "./pages/Pedidos";
 import NovoPedido from "./pages/NovoPedido";
 import Financeiro from "./pages/Financeiro";
+import Configuracoes from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,10 +49,7 @@ const App = () => (
           } />
           <Route path="/configuracoes" element={
             <AppLayout>
-              <div className="text-center py-12">
-                <h1 className="text-2xl font-bold mb-4">Configurações</h1>
-                <p className="text-muted-foreground">Em desenvolvimento...</p>
-              </div>
+              <Configuracoes />
             </AppLayout>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
