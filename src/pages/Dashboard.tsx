@@ -1,6 +1,6 @@
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { 
   FileText, 
@@ -168,7 +168,7 @@ const Dashboard = () => {
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={ordersData}>
+                <BarChart data={ordersData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis 
                     dataKey="month" 
@@ -187,15 +187,12 @@ const Dashboard = () => {
                       />
                     }
                   />
-                  <Area 
-                    type="monotone" 
+                  <Bar 
                     dataKey="orders" 
-                    stroke="hsl(var(--primary))" 
                     fill="hsl(var(--primary))" 
-                    fillOpacity={0.2}
-                    strokeWidth={2}
+                    radius={[4, 4, 0, 0]}
                   />
-                </AreaChart>
+                </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
