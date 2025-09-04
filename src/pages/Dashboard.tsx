@@ -1,13 +1,14 @@
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { 
   FileText, 
   Users, 
   Clock, 
   CheckCircle, 
-  XCircle, 
-  AlertTriangle,
-  TrendingUp 
+  TrendingUp,
+  BarChart3
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -45,47 +46,49 @@ const Dashboard = () => {
     {
       id: "PED-001",
       client: "Construtora ABC Ltda",
-      value: "R$ 45.890,00",
-      status: "Em Análise da IA",
-      date: "Hoje, 14:30"
+      value: "R$ 45.890,00"
     },
     {
       id: "PED-002", 
       client: "Obras & Cia",
-      value: "R$ 23.450,00",
-      status: "Análise do Faturista",
-      date: "Hoje, 11:15"
+      value: "R$ 23.450,00"
     },
     {
       id: "PED-003",
       client: "Edificações Norte",
-      value: "R$ 67.230,00", 
-      status: "Aprovado",
-      date: "Ontem, 16:45"
+      value: "R$ 67.230,00"
     },
     {
       id: "PED-004",
       client: "Reformas Sul",
-      value: "R$ 12.670,00",
-      status: "Devolvido para Ajuste",
-      date: "Ontem, 14:20"
+      value: "R$ 12.670,00"
+    },
+    {
+      id: "PED-005",
+      client: "Construções Centro",
+      value: "R$ 89.120,00"
     }
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Em Análise da IA":
-        return "bg-blue-50 text-blue-700 border-blue-200";
-      case "Análise do Faturista":
-        return "bg-orange-50 text-orange-700 border-orange-200";
-      case "Aprovado":
-        return "bg-green-50 text-green-700 border-green-200";
-      case "Devolvido para Ajuste":
-        return "bg-red-50 text-red-700 border-red-200";
-      default:
-        return "bg-gray-50 text-gray-700 border-gray-200";
+  const revenueData = [
+    { month: "Jan", revenue: 145000 },
+    { month: "Fev", revenue: 158000 },
+    { month: "Mar", revenue: 172000 },
+    { month: "Abr", revenue: 165000 },
+    { month: "Mai", revenue: 189000 },
+    { month: "Jun", revenue: 203000 },
+    { month: "Jul", revenue: 195000 },
+    { month: "Ago", revenue: 218000 },
+    { month: "Set", revenue: 235000 }
+  ];
+
+  const chartConfig = {
+    revenue: {
+      label: "Receita",
+      color: "hsl(var(--primary))"
     }
   };
+
 
   return (
     <div className="space-y-8">
@@ -114,26 +117,26 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Orders */}
+        {/* Últimos Pedidos */}
         <Card className="shadow-custom-md border-border">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-primary" />
-              Pedidos Recentes
+              Últimos Pedidos
             </CardTitle>
             <CardDescription>
-              Últimos pedidos enviados para aprovação
+              Pedidos mais recentes
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {recentOrders.map((order) => (
                 <div 
                   key={order.id} 
-                  className="flex items-center justify-between p-4 border border-border rounded-lg bg-card/50 hover:bg-card transition-fast"
+                  className="flex items-center justify-between p-3 border border-border rounded-lg bg-card/50 hover:bg-card transition-fast"
                 >
                   <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between">
                       <h4 className="font-semibold text-foreground">
                         {order.id}
                       </h4>
@@ -141,19 +144,9 @@ const Dashboard = () => {
                         {order.value}
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">
+                    <p className="text-sm text-muted-foreground mt-1">
                       {order.client}
                     </p>
-                    <div className="flex items-center justify-between">
-                      <span 
-                        className={`text-xs px-2 py-1 rounded-full border font-medium ${getStatusColor(order.status)}`}
-                      >
-                        {order.status}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {order.date}
-                      </span>
-                    </div>
                   </div>
                 </div>
               ))}
@@ -161,51 +154,50 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Status Distribution */}
+        {/* Revenue Chart */}
         <Card className="shadow-custom-md border-border">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-primary" />
-              Status dos Pedidos
+              <BarChart3 className="h-5 w-5 text-primary" />
+              Receita Mensal
             </CardTitle>
             <CardDescription>
-              Distribuição por etapa do workflow
+              Evolução da receita nos últimos meses
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 border border-border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="h-3 w-3 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Em Análise da IA</span>
-                </div>
-                <span className="text-sm font-bold">23</span>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 border border-border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="h-3 w-3 bg-orange-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Análise do Faturista</span>
-                </div>
-                <span className="text-sm font-bold">15</span>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 border border-border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="h-3 w-3 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Aprovados</span>
-                </div>
-                <span className="text-sm font-bold">184</span>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 border border-border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="h-3 w-3 bg-red-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Devolvidos</span>
-                </div>
-                <span className="text-sm font-bold">9</span>
-              </div>
-            </div>
+            <ChartContainer config={chartConfig} className="h-[200px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={revenueData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis 
+                    dataKey="month" 
+                    className="text-muted-foreground"
+                    fontSize={12}
+                  />
+                  <YAxis 
+                    className="text-muted-foreground"
+                    fontSize={12}
+                    tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
+                  />
+                  <ChartTooltip 
+                    content={
+                      <ChartTooltipContent 
+                        formatter={(value) => [`R$ ${value.toLocaleString('pt-BR')}`, "Receita"]}
+                      />
+                    }
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="revenue" 
+                    stroke="hsl(var(--primary))" 
+                    fill="hsl(var(--primary))" 
+                    fillOpacity={0.2}
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
         </Card>
       </div>
