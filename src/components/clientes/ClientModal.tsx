@@ -138,6 +138,14 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
 
   const onSubmit = (data: ClientFormData) => {
     console.log("onSubmit executado", data);
+    
+    // Só processa o submit na etapa 2 (ou se for edição de cliente existente)
+    if (!cliente && currentStep === 1) {
+      console.log("Impedindo submit na etapa 1 - indo para próxima etapa");
+      nextStep();
+      return;
+    }
+    
     const clienteData: Cliente = {
       ...data,
       id: cliente?.id,
