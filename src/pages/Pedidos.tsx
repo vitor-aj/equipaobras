@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { PedidoDetailModal } from "@/components/pedidos/PedidoDetailModal";
+import { NovoPedidoModal } from "@/components/pedidos/NovoPedidoModal";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Plus, 
@@ -49,12 +49,12 @@ interface Pedido {
 }
 
 const Pedidos = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("todos");
   const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isNovoPedidoModalOpen, setIsNovoPedidoModalOpen] = useState(false);
   const [pedidos, setPedidos] = useState<Pedido[]>([
     {
       id: "PED-001",
@@ -136,6 +136,19 @@ const Pedidos = () => {
     });
   };
 
+  const handleNovoPedido = (data: { clienteId: string; valor: string; observacoes: string; cliente: string }) => {
+    const novoPedido: Pedido = {
+      id: `PED-${String(Date.now()).slice(-3)}`,
+      cliente: data.cliente,
+      valor: data.valor,
+      status: "Em Análise da IA",
+      data: new Date().toISOString().split('T')[0],
+      observacoes: data.observacoes || undefined
+    };
+
+    setPedidos(prev => [novoPedido, ...prev]);
+  };
+
   const statusCounts = {
     total: pedidos.length,
     analiseIA: pedidos.filter(p => p.status === "Em Análise da IA").length,
@@ -157,7 +170,7 @@ const Pedidos = () => {
           </p>
         </div>
         
-        <Button className="flex items-center gap-2 shadow-custom-md" onClick={() => navigate("/pedidos/novo")}>
+        <Button className="flex items-center gap-2 shadow-custom-md" onClick={() => setIsNovoPedidoModalOpen(true)}>
           <Plus className="h-4 w-4" />
           Novo Pedido
         </Button>
@@ -372,6 +385,13 @@ const Pedidos = () => {
           setSelectedPedido(null);
         }}
         pedido={selectedPedido}
+      />
+
+      {/* Modal de Novo Pedido */}
+      <NovoPedidoModal
+        isOpen={isNovoPedidoModalOpen}
+        onClose={() => setIsNovoPedidoModalOpen(false)}
+        onSubmit={handleNovoPedido}
       />
     </div>
   );
