@@ -255,9 +255,9 @@ const Clientes = () => {
 
   const getStatusBadge = (status: Cliente["status"]) => {
     const variants = {
-      "Análise da IA": { variant: "secondary" as const, icon: Clock, className: "bg-blue-50 text-blue-700 border-blue-200" },
-      "Aprovado": { variant: "default" as const, icon: CheckCircle, className: "bg-success/10 text-success border-success/20" },
-      "Reprovado": { variant: "destructive" as const, icon: XCircle, className: "bg-destructive/10 text-destructive border-destructive/20" }
+      "Análise da IA": { variant: "secondary" as const, icon: Clock, className: "bg-blue-50 text-blue-700 border-blue-200 whitespace-nowrap text-xs px-2.5 py-1" },
+      "Aprovado": { variant: "default" as const, icon: CheckCircle, className: "bg-success/10 text-success border-success/20 whitespace-nowrap text-xs px-2.5 py-1" },
+      "Reprovado": { variant: "destructive" as const, icon: XCircle, className: "bg-destructive/10 text-destructive border-destructive/20 whitespace-nowrap text-xs px-2.5 py-1" }
     };
     
     const config = variants[status];
@@ -265,8 +265,8 @@ const Clientes = () => {
     
     return (
       <Badge className={config.className}>
-        <Icon className="h-3 w-3 mr-1" />
-        {status}
+        <Icon className="h-3 w-3 mr-1 flex-shrink-0" />
+        <span>{status}</span>
       </Badge>
     );
   };
