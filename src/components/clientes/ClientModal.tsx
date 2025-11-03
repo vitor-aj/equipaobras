@@ -31,6 +31,53 @@ import { Textarea } from "@/components/ui/textarea";
 import { Upload, FileText, X, ArrowLeft, ArrowRight, CheckCircle, AlertCircle, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+// Funções de formatação
+const formatCNPJ = (value: string) => {
+  const numbers = value.replace(/\D/g, '');
+  if (numbers.length <= 14) {
+    return numbers
+      .replace(/(\d{2})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1/$2')
+      .replace(/(\d{4})(\d)/, '$1-$2');
+  }
+  return value;
+};
+
+const formatCEP = (value: string) => {
+  const numbers = value.replace(/\D/g, '');
+  if (numbers.length <= 8) {
+    return numbers.replace(/(\d{5})(\d)/, '$1-$2');
+  }
+  return value;
+};
+
+const formatTelefone = (value: string) => {
+  const numbers = value.replace(/\D/g, '');
+  if (numbers.length <= 11) {
+    if (numbers.length <= 10) {
+      return numbers
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{4})(\d)/, '$1-$2');
+    }
+    return numbers
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{5})(\d)/, '$1-$2');
+  }
+  return value;
+};
+
+const formatInscricaoEstadual = (value: string) => {
+  const numbers = value.replace(/\D/g, '');
+  if (numbers.length <= 12) {
+    return numbers
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2');
+  }
+  return value;
+};
+
 export interface Cliente {
   id?: string;
   nomeFantasia: string;
@@ -394,7 +441,15 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                       <FormItem>
                         <FormLabel>CNPJ *</FormLabel>
                         <FormControl>
-                          <Input placeholder="00.000.000/0000-00" {...field} />
+                          <Input 
+                            placeholder="00.000.000/0000-00" 
+                            {...field}
+                            onChange={(e) => {
+                              const formatted = formatCNPJ(e.target.value);
+                              field.onChange(formatted);
+                            }}
+                            maxLength={18}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -408,7 +463,15 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                       <FormItem>
                         <FormLabel>Inscrição Estadual *</FormLabel>
                         <FormControl>
-                          <Input placeholder="000.000.000" {...field} />
+                          <Input 
+                            placeholder="000.000.000.000" 
+                            {...field}
+                            onChange={(e) => {
+                              const formatted = formatInscricaoEstadual(e.target.value);
+                              field.onChange(formatted);
+                            }}
+                            maxLength={15}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -436,7 +499,15 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                       <FormItem>
                         <FormLabel>Telefone de Contato *</FormLabel>
                         <FormControl>
-                          <Input placeholder="(00) 00000-0000" {...field} />
+                          <Input 
+                            placeholder="(00) 00000-0000" 
+                            {...field}
+                            onChange={(e) => {
+                              const formatted = formatTelefone(e.target.value);
+                              field.onChange(formatted);
+                            }}
+                            maxLength={15}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -450,7 +521,15 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                       <FormItem>
                         <FormLabel>CEP *</FormLabel>
                         <FormControl>
-                          <Input placeholder="00000-000" {...field} />
+                          <Input 
+                            placeholder="00000-000" 
+                            {...field}
+                            onChange={(e) => {
+                              const formatted = formatCEP(e.target.value);
+                              field.onChange(formatted);
+                            }}
+                            maxLength={9}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
