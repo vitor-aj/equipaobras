@@ -400,7 +400,7 @@ const Clientes = () => {
                     </div>
                   </TableCell>
                   <TableCell>{cliente.razaoSocial}</TableCell>
-                  <TableCell className="font-mono text-sm">{cliente.cnpj}</TableCell>
+                  <TableCell className="font-mono text-sm whitespace-nowrap">{cliente.cnpj}</TableCell>
                   <TableCell>
                     {getStatusBadge(cliente.status)}
                   </TableCell>
