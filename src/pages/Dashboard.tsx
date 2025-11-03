@@ -18,14 +18,14 @@ const Dashboard = () => {
       value: 247,
       subtitle: "Este mês",
       icon: <FileText className="h-6 w-6 text-primary" />,
-      trend: { value: 12, isPositive: true }
+      trend: { value: 2.5, isPositive: true }
     },
     {
       title: "Clientes Ativos",
       value: 89,
       subtitle: "Cadastrados",
       icon: <Users className="h-6 w-6 text-primary" />,
-      trend: { value: 5, isPositive: true }
+      trend: { value: 1.8, isPositive: true }
     },
     {
       title: "Em Análise",
@@ -38,7 +38,7 @@ const Dashboard = () => {
       value: 184,
       subtitle: "Finalizados com sucesso",
       icon: <CheckCircle className="h-6 w-6 text-success" />,
-      trend: { value: 8, isPositive: true }
+      trend: { value: 3.2, isPositive: true }
     }
   ];
 
