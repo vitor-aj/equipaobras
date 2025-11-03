@@ -24,13 +24,13 @@ const NovoPedido = () => {
     observacoes: ""
   });
 
-  // Mock data - seria conectado ao banco via Supabase
+  // Mock data - apenas clientes aprovados
   const clientes = [
-    { id: "1", nome: "Construtora ABC Ltda" },
-    { id: "2", nome: "Obras & Cia" },
-    { id: "3", nome: "Edificações Norte" },
-    { id: "4", nome: "Reformas Sul" }
-  ];
+    { id: "1", nome: "ABC Construtora", status: "Aprovado" },
+    { id: "4", nome: "Reforma Total", status: "Aprovado" },
+    { id: "7", nome: "Obras Primas Ltda", status: "Aprovado" },
+    { id: "9", nome: "Construtora Alfa", status: "Aprovado" }
+  ].filter(c => c.status === "Aprovado");
 
   const handleSubmit = (action: "save" | "send") => {
     // Aqui seria integrado com Supabase para salvar/enviar o pedido

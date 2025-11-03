@@ -94,7 +94,7 @@ export interface Cliente {
   uf: string;
   tipoFaturamento?: string;
   empresaFaturamento?: string;
-  status: "Liberado" | "Bloqueado" | "Inativo" | "Em aprovação" | "Análise da IA" | "Análise do Financeiro" | "Aprovado" | "Reprovado";
+  status: "Aprovado" | "Análise da IA" | "Reprovado";
   motivoReprovacao?: string;
 }
 
@@ -113,7 +113,7 @@ const clientSchema = z.object({
   uf: z.string().min(2, "UF é obrigatória"),
   tipoFaturamento: z.string().min(1, "Tipo de faturamento é obrigatório"),
   empresaFaturamento: z.string().optional(),
-  status: z.enum(["Liberado", "Bloqueado", "Inativo", "Em aprovação", "Análise da IA", "Análise do Financeiro", "Aprovado", "Reprovado"]),
+  status: z.enum(["Aprovado", "Análise da IA", "Reprovado"]),
 });
 
 type ClientFormData = z.infer<typeof clientSchema>;
@@ -211,7 +211,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
       uf: cliente?.uf || "",
       tipoFaturamento: cliente?.tipoFaturamento || "",
       empresaFaturamento: cliente?.empresaFaturamento || "",
-      status: cliente?.status || "Em aprovação",
+      status: cliente?.status || "Análise da IA",
     },
   });
   
@@ -230,7 +230,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
     const clienteData: Cliente = {
       ...data,
       id: cliente?.id || Date.now().toString(),
-      status: cliente ? data.status : "Em aprovação",
+      status: cliente ? data.status : "Análise da IA",
     };
     
     console.log("clienteData criado", clienteData);
@@ -251,13 +251,13 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
         onClose();
       }, 2500);
     } else {
-      const wasRejected = cliente?.status === "Reprovado" && data.status === "Em aprovação";
+      const wasRejected = cliente?.status === "Reprovado" && data.status === "Análise da IA";
       
       onSave(clienteData);
       toast({
         title: wasRejected ? "Cadastro Reenviado!" : "Cliente Atualizado!",
         description: wasRejected 
-          ? "O cadastro foi corrigido e reenviado para aprovação. Você será notificado sobre o novo status."
+          ? "O cadastro foi corrigido e reenviado para análise. Você será notificado sobre o novo status."
           : "As informações do cliente foram atualizadas com sucesso.",
       });
       form.reset();
@@ -328,14 +328,14 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
           <div className="text-center py-8">
             <CheckCircle className="h-16 w-16 text-success mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Cadastro Finalizado com Sucesso!</h3>
-            <p className="text-muted-foreground mb-4">
-              O cadastro do cliente foi finalizado com sucesso e estará passando por aprovação interna.
+            <p className="text-sm text-muted-foreground mb-4">
+              O cadastro do cliente foi finalizado com sucesso e está em análise da IA.
             </p>
             <p className="text-sm text-muted-foreground">
-              Status: <span className="font-medium text-warning">Em aprovação</span>
+              Status: <span className="font-medium text-blue-600">Análise da IA</span>
             </p>
             <p className="text-xs text-muted-foreground mt-2">
-              Você será notificado quando a aprovação interna for concluída.
+              Você será notificado quando a análise for concluída.
             </p>
           </div>
         </DialogContent>
@@ -620,13 +620,8 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="Liberado">Liberado</SelectItem>
-                              <SelectItem value="Bloqueado">Bloqueado</SelectItem>
-                              <SelectItem value="Inativo">Inativo</SelectItem>
-                              <SelectItem value="Em aprovação">Em aprovação</SelectItem>
-                              <SelectItem value="Análise da IA">Análise da IA</SelectItem>
-                              <SelectItem value="Análise do Financeiro">Análise do Financeiro</SelectItem>
                               <SelectItem value="Aprovado">Aprovado</SelectItem>
+                              <SelectItem value="Análise da IA">Análise da IA</SelectItem>
                               <SelectItem value="Reprovado">Reprovado</SelectItem>
                             </SelectContent>
                           </Select>
@@ -824,8 +819,8 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                     type="submit" 
                     className="bg-success hover:bg-success/90"
                     onClick={() => {
-                      // Muda o status para "Em aprovação" quando reenviar
-                      form.setValue("status", "Em aprovação");
+                      // Muda o status para "Análise da IA" quando reenviar
+                      form.setValue("status", "Análise da IA");
                     }}
                   >
                     <RotateCcw className="h-4 w-4 mr-2" />

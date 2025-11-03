@@ -33,7 +33,7 @@ interface Cliente {
   id: string;
   nomeFantasia: string;
   razaoSocial: string;
-  status: "Ativo" | "Em aprovação" | "Inativo";
+  status: "Aprovado" | "Análise da IA" | "Reprovado";
   empresaFaturamento?: string;
 }
 
@@ -53,27 +53,32 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
   const { toast } = useToast();
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
 
-  // Mock de clientes ativos - em produção viria de uma API
+  // Mock de clientes aprovados - em produção viria de uma API
   const clientesAtivos: Cliente[] = [
     {
       id: "1",
-      nomeFantasia: "Construtora ABC",
-      razaoSocial: "Construtora ABC Ltda",
-      status: "Ativo",
-      empresaFaturamento: "ABC Faturamento S.A."
+      nomeFantasia: "ABC Construtora",
+      razaoSocial: "ABC Construtora Ltda",
+      status: "Aprovado"
     },
     {
-      id: "2", 
-      nomeFantasia: "Obras & Cia",
-      razaoSocial: "Obras & Cia Ltda",
-      status: "Ativo"
+      id: "4", 
+      nomeFantasia: "Reforma Total",
+      razaoSocial: "Reforma Total Construções Ltda",
+      status: "Aprovado"
     },
     {
-      id: "3",
-      nomeFantasia: "Edificações Norte",
-      razaoSocial: "Edificações Norte S.A.",
-      status: "Ativo",
-      empresaFaturamento: "Norte Administração Ltda"
+      id: "7",
+      nomeFantasia: "Obras Primas Ltda",
+      razaoSocial: "Obras Primas Construções e Reformas Ltda",
+      status: "Aprovado",
+      empresaFaturamento: "Empresa C ME"
+    },
+    {
+      id: "9",
+      nomeFantasia: "Construtora Alfa",
+      razaoSocial: "Alfa Construções e Empreendimentos Ltda",
+      status: "Aprovado"
     }
   ];
 
