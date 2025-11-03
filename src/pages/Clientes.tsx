@@ -58,7 +58,7 @@ const Clientes = () => {
       uf: "SP",
       email: "contato@abcconstrutora.com.br",
       telefone: "(11) 99999-8888",
-      faturamentoTerceiros: false,
+      tipoFaturamento: "propria-empresa",
       status: "Aprovado" as const
     },
     {
@@ -75,8 +75,7 @@ const Clientes = () => {
       uf: "SP",
       email: "obras@obrasecia.com.br",
       telefone: "(11) 88888-7777",
-      faturamentoTerceiros: true,
-      situacaoFaturamento: "Contrato entre as duas empresas",
+      tipoFaturamento: "contrato-obra",
       empresaFaturamento: "Empresa A Ltda",
       status: "Análise do Financeiro" as const
     },
@@ -94,7 +93,7 @@ const Clientes = () => {
       uf: "SP",
       email: "contato@edificacoesnorte.com",
       telefone: "(11) 77777-6666",
-      faturamentoTerceiros: false,
+      tipoFaturamento: "carta-autorizacao",
       status: "Análise da IA" as const
     },
     {
@@ -111,7 +110,7 @@ const Clientes = () => {
       uf: "SP",
       email: "contato@reformatotal.com.br",
       telefone: "(11) 66666-5555",
-      faturamentoTerceiros: false,
+      tipoFaturamento: "mesmos-socios",
       status: "Reprovado" as const,
       motivoReprovacao: "CNPJ inválido e documentos de comprovação de endereço não foram enviados. Por favor, corrija o CNPJ e anexe os documentos necessários."
     }

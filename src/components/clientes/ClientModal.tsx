@@ -45,8 +45,7 @@ export interface Cliente {
   bairro: string;
   cidade: string;
   uf: string;
-  faturamentoTerceiros: boolean;
-  situacaoFaturamento?: string;
+  tipoFaturamento?: string;
   empresaFaturamento?: string;
   status: "Liberado" | "Bloqueado" | "Inativo" | "Em aprovação" | "Análise da IA" | "Análise do Financeiro" | "Aprovado" | "Reprovado";
   motivoReprovacao?: string;
@@ -65,18 +64,9 @@ const clientSchema = z.object({
   bairro: z.string().min(1, "Bairro é obrigatório"),
   cidade: z.string().min(1, "Cidade é obrigatória"),
   uf: z.string().min(2, "UF é obrigatória"),
-  faturamentoTerceiros: z.boolean(),
-  situacaoFaturamento: z.string().optional(),
+  tipoFaturamento: z.string().min(1, "Tipo de faturamento é obrigatório"),
   empresaFaturamento: z.string().optional(),
   status: z.enum(["Liberado", "Bloqueado", "Inativo", "Em aprovação", "Análise da IA", "Análise do Financeiro", "Aprovado", "Reprovado"]),
-}).refine((data) => {
-  if (data.faturamentoTerceiros) {
-    return data.situacaoFaturamento && data.empresaFaturamento;
-  }
-  return true;
-}, {
-  message: "Campos de faturamento são obrigatórios quando marcado faturamento para terceiros",
-  path: ["situacaoFaturamento"],
 });
 
 type ClientFormData = z.infer<typeof clientSchema>;
@@ -95,19 +85,54 @@ interface AnexoFile {
   file?: File;
 }
 
-const documentTypes = [
-  { id: "contrato-social", name: "Contrato Social", required: true },
-  { id: "cartao-cnpj", name: "Cartão CNPJ", required: true },
-  { id: "nota-fiscal-1", name: "Nota Fiscal 1", required: true },
-  { id: "nota-fiscal-2", name: "Nota Fiscal 2", required: true },
-  { id: "nota-fiscal-3", name: "Nota Fiscal 3", required: true },
-  { id: "autorizacao-terceiros", name: "Autorização/Carta de Terceiros/Contrato", required: false },
-];
-
-const situacoesFaturamento = [
-  "Contrato entre as duas empresas",
-  "Autorização da outra empresa", 
-  "Mesmo Socio"
+const tiposFaturamento = [
+  { 
+    id: "propria-empresa", 
+    label: "Faturamento para a Própria Empresa",
+    documentos: [
+      { id: "cartao-cnpj", name: "Cartão CNPJ", required: true },
+      { id: "contrato-social", name: "Contrato Social", required: true },
+      { id: "nota-fiscal-1", name: "Nota Fiscal 1", required: true },
+      { id: "nota-fiscal-2", name: "Nota Fiscal 2", required: true },
+      { id: "nota-fiscal-3", name: "Nota Fiscal 3", required: true },
+    ]
+  },
+  { 
+    id: "contrato-obra", 
+    label: "Faturamento para Empresa Terceira (Contrato de Obra)",
+    documentos: [
+      { id: "cartao-cnpj", name: "Cartão CNPJ", required: true },
+      { id: "contrato-social", name: "Contrato Social", required: true },
+      { id: "nota-fiscal-1", name: "Nota Fiscal 1", required: true },
+      { id: "nota-fiscal-2", name: "Nota Fiscal 2", required: true },
+      { id: "nota-fiscal-3", name: "Nota Fiscal 3", required: true },
+      { id: "contrato-obra", name: "Contrato de Obra", required: true },
+    ]
+  },
+  { 
+    id: "carta-autorizacao", 
+    label: "Empresa com Carta de Autorização",
+    documentos: [
+      { id: "cartao-cnpj", name: "Cartão CNPJ", required: true },
+      { id: "contrato-social", name: "Contrato Social", required: true },
+      { id: "nota-fiscal-1", name: "Nota Fiscal 1", required: true },
+      { id: "nota-fiscal-2", name: "Nota Fiscal 2", required: true },
+      { id: "nota-fiscal-3", name: "Nota Fiscal 3", required: true },
+      { id: "carta-autorizacao", name: "Carta de Autorização", required: true },
+    ]
+  },
+  { 
+    id: "mesmos-socios", 
+    label: "Empresas com Mesmos Sócios",
+    documentos: [
+      { id: "cartao-cnpj", name: "Cartão CNPJ", required: true },
+      { id: "contrato-social", name: "Contrato Social", required: true },
+      { id: "nota-fiscal-1", name: "Nota Fiscal 1", required: true },
+      { id: "nota-fiscal-2", name: "Nota Fiscal 2", required: true },
+      { id: "nota-fiscal-3", name: "Nota Fiscal 3", required: true },
+      { id: "verificacao-socios", name: "Verificação de Sócios em Comum", required: true },
+    ]
+  },
 ];
 
 const empresasFaturamento = [
@@ -137,14 +162,14 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
       bairro: cliente?.bairro || "",
       cidade: cliente?.cidade || "",
       uf: cliente?.uf || "",
-      faturamentoTerceiros: cliente?.faturamentoTerceiros || false,
-      situacaoFaturamento: cliente?.situacaoFaturamento || "",
+      tipoFaturamento: cliente?.tipoFaturamento || "",
       empresaFaturamento: cliente?.empresaFaturamento || "",
       status: cliente?.status || "Em aprovação",
     },
   });
   
-  const watchFaturamentoTerceiros = form.watch("faturamentoTerceiros");
+  const watchTipoFaturamento = form.watch("tipoFaturamento");
+  const currentDocumentTypes = tiposFaturamento.find(t => t.id === watchTipoFaturamento)?.documentos || [];
 
   const onSubmit = (data: ClientFormData) => {
     console.log("onSubmit executado", data);
@@ -216,13 +241,8 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
   };
 
   const canFinalize = () => {
-    const faturamentoTerceiros = form.getValues("faturamentoTerceiros");
-    if (faturamentoTerceiros) {
-      const situacao = form.getValues("situacaoFaturamento");
-      const empresa = form.getValues("empresaFaturamento");
-      return situacao && empresa;
-    }
-    return true;
+    const tipoFaturamento = form.getValues("tipoFaturamento");
+    return !!tipoFaturamento;
   };
 
   const handleFileUpload = (documentId: string, file: File) => {
@@ -544,152 +564,135 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
             {(cliente || (!cliente && currentStep === 2)) && (
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Faturamento</h3>
+                  <h3 className="text-lg font-semibold">Tipo de Faturamento</h3>
                   <FormField
                     control={form.control}
-                    name="faturamentoTerceiros"
+                    name="tipoFaturamento"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel>
-                            Faturamento para empresa terceira?
-                          </FormLabel>
-                        </div>
+                      <FormItem>
+                        <FormLabel>Selecione o Tipo de Faturamento *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o tipo de faturamento" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {tiposFaturamento.map((tipo) => (
+                              <SelectItem key={tipo.id} value={tipo.id}>
+                                {tipo.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
 
-                  {watchFaturamentoTerceiros && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="situacaoFaturamento"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Situação de Faturamento Terceiros *</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecione a situação" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {situacoesFaturamento.map((situacao) => (
-                                  <SelectItem key={situacao} value={situacao}>
-                                    {situacao}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="empresaFaturamento"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Empresa que será Faturada *</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecione a empresa" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {empresasFaturamento.map((empresa) => (
-                                  <SelectItem key={empresa} value={empresa}>
-                                    {empresa}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                  {(watchTipoFaturamento === "contrato-obra" || watchTipoFaturamento === "carta-autorizacao" || watchTipoFaturamento === "mesmos-socios") && (
+                    <FormField
+                      control={form.control}
+                      name="empresaFaturamento"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Empresa que será Faturada</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione a empresa" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {empresasFaturamento.map((empresa) => (
+                                <SelectItem key={empresa} value={empresa}>
+                                  {empresa}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   )}
                 </div>
 
-                {/* Anexos - sempre visíveis na Etapa 2 */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Anexos</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {documentTypes.map((docType) => {
-                      const uploadedFile = uploadedFiles[docType.id];
-                      const isRequired = docType.required;
-                      
-                      return (
-                        <Card key={docType.id} className="border-border">
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-sm flex items-center justify-between">
-                              <span className="flex items-center gap-2">
-                                <FileText className="h-4 w-4" />
-                                {docType.name}
-                                {isRequired && <span className="text-destructive">*</span>}
-                              </span>
-                              {uploadedFile && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleRemoveFile(docType.id)}
-                                  className="h-6 w-6 p-0 text-destructive hover:text-destructive"
-                                >
-                                  <X className="h-3 w-3" />
-                                </Button>
-                              )}
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            {uploadedFile ? (
-                              <div className="space-y-2">
-                                <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
-                                  <FileText className="h-4 w-4 text-muted-foreground" />
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium truncate">
-                                      {uploadedFile.name}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                      {formatFileSize(uploadedFile.size)}
-                                    </p>
+                {/* Anexos - dinâmicos baseados no tipo de faturamento */}
+                {watchTipoFaturamento && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Documentos Necessários</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Faça upload dos documentos necessários para o tipo de faturamento selecionado
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {currentDocumentTypes.map((docType) => {
+                        const uploadedFile = uploadedFiles[docType.id];
+                        const isRequired = docType.required;
+                        
+                        return (
+                          <Card key={docType.id} className="border-border">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-sm flex items-center justify-between">
+                                <span className="flex items-center gap-2">
+                                  <FileText className="h-4 w-4" />
+                                  {docType.name}
+                                  {isRequired && <span className="text-destructive">*</span>}
+                                </span>
+                                {uploadedFile && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleRemoveFile(docType.id)}
+                                    className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </Button>
+                                )}
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              {uploadedFile ? (
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
+                                    <FileText className="h-4 w-4 text-muted-foreground" />
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-medium truncate">
+                                        {uploadedFile.name}
+                                      </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        {formatFileSize(uploadedFile.size)}
+                                      </p>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            ) : (
-                              <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors">
-                                <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                                <span className="text-sm text-muted-foreground text-center">
-                                  Clique para enviar<br />
-                                  ou arraste o arquivo aqui
-                                </span>
-                                <input
-                                  type="file"
-                                  className="hidden"
-                                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                      handleFileUpload(docType.id, file);
-                                    }
-                                  }}
-                                />
-                              </label>
-                            )}
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
+                              ) : (
+                                <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors">
+                                  <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                                  <span className="text-sm text-muted-foreground text-center">
+                                    Clique para enviar<br />
+                                    ou arraste o arquivo aqui
+                                  </span>
+                                  <input
+                                    type="file"
+                                    className="hidden"
+                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) {
+                                        handleFileUpload(docType.id, file);
+                                      }
+                                    }}
+                                  />
+                                </label>
+                              )}
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 

@@ -42,8 +42,7 @@ export interface ClienteAprovacao {
     cidade: string;
     uf: string;
   };
-  faturamentoTerceiros: boolean;
-  situacaoFaturamento?: string;
+  tipoFaturamento: string;
   empresaFaturamento?: string;
   dataCadastro: string;
   anexos: {
@@ -325,12 +324,19 @@ export const ClientApprovalModal = ({
                     </p>
                   </div>
 
-                  {cliente.faturamentoTerceiros && (
+                  {cliente.tipoFaturamento !== "propria-empresa" && (
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                      <h4 className="font-medium text-amber-800 mb-2">Faturamento para Terceiros</h4>
+                      <h4 className="font-medium text-amber-800 mb-2">Informações de Faturamento</h4>
                       <div className="space-y-1 text-sm text-amber-700">
-                        <p><strong>Situação:</strong> {cliente.situacaoFaturamento}</p>
-                        <p><strong>Empresa:</strong> {cliente.empresaFaturamento}</p>
+                        <p><strong>Tipo:</strong> {
+                          cliente.tipoFaturamento === "contrato-obra" ? "Faturamento para Empresa Terceira (Contrato de Obra)" :
+                          cliente.tipoFaturamento === "carta-autorizacao" ? "Empresa com Carta de Autorização" :
+                          cliente.tipoFaturamento === "mesmos-socios" ? "Empresas com Mesmos Sócios" :
+                          cliente.tipoFaturamento
+                        }</p>
+                        {cliente.empresaFaturamento && (
+                          <p><strong>Empresa:</strong> {cliente.empresaFaturamento}</p>
+                        )}
                       </div>
                     </div>
                   )}

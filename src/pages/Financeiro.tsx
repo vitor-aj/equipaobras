@@ -39,7 +39,7 @@ const Financeiro = () => {
         cidade: "São Paulo",
         uf: "SP"
       },
-      faturamentoTerceiros: false,
+      tipoFaturamento: "propria-empresa",
       dataCadastro: "2024-01-15",
       anexos: {
         contratoSocial: "contrato_social_tech.pdf",
@@ -79,8 +79,7 @@ const Financeiro = () => {
         cidade: "São Paulo", 
         uf: "SP"
       },
-      faturamentoTerceiros: true,
-      situacaoFaturamento: "Contrato entre as duas empresas",
+      tipoFaturamento: "contrato-obra",
       empresaFaturamento: "Empresa A Ltda",
       dataCadastro: "2024-01-14",
       anexos: {
@@ -235,10 +234,10 @@ const Financeiro = () => {
                         <Calendar className="h-3 w-3" />
                         Cadastro: {new Date(cliente.dataCadastro).toLocaleDateString('pt-BR')}
                       </span>
-                      {cliente.faturamentoTerceiros && (
+                      {cliente.tipoFaturamento !== "propria-empresa" && (
                         <span className="flex items-center gap-1 text-amber-600">
                           <AlertTriangle className="h-3 w-3" />
-                          Faturamento Terceiros
+                          Faturamento Especial
                         </span>
                       )}
                     </div>
