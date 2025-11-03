@@ -69,6 +69,14 @@ const clientSchema = z.object({
   situacaoFaturamento: z.string().optional(),
   empresaFaturamento: z.string().optional(),
   status: z.enum(["Liberado", "Bloqueado", "Inativo", "Em aprovação", "Análise da IA", "Análise do Financeiro", "Aprovado", "Reprovado"]),
+}).refine((data) => {
+  if (data.faturamentoTerceiros) {
+    return data.situacaoFaturamento && data.empresaFaturamento;
+  }
+  return true;
+}, {
+  message: "Campos de faturamento são obrigatórios quando marcado faturamento para terceiros",
+  path: ["situacaoFaturamento"],
 });
 
 type ClientFormData = z.infer<typeof clientSchema>;
@@ -203,6 +211,16 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
     if (currentStep === 1) {
       const step1Fields = ['nomeFantasia', 'razaoSocial', 'cnpj', 'inscricaoEstadual', 'email', 'telefone', 'cep', 'rua', 'numero', 'bairro', 'cidade', 'uf'];
       return step1Fields.every(field => form.getValues(field as keyof ClientFormData));
+    }
+    return true;
+  };
+
+  const canFinalize = () => {
+    const faturamentoTerceiros = form.getValues("faturamentoTerceiros");
+    if (faturamentoTerceiros) {
+      const situacao = form.getValues("situacaoFaturamento");
+      const empresa = form.getValues("empresaFaturamento");
+      return situacao && empresa;
     }
     return true;
   };
@@ -713,7 +731,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 ) : (
-                  <Button type="submit">
+                  <Button type="submit" disabled={!canFinalize()}>
                     Finalizar
                   </Button>
                 )}
