@@ -165,8 +165,8 @@ const Dashboard = () => {
               Evolução dos pedidos nos últimos meses
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig} className="h-[350px]">
+          <CardContent className="h-[400px]">
+            <ChartContainer config={chartConfig} className="h-full w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={ordersData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
