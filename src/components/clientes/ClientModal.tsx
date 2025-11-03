@@ -335,7 +335,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
               </Card>
             )}
             {/* Etapa 1: Dados da Empresa */}
-            {(cliente || currentStep === 1) && (
+            {(cliente || (!cliente && currentStep === 1)) && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Dados da Empresa</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -541,7 +541,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
             )}
 
             {/* Etapa 2: Faturamento */}
-            {(cliente || currentStep === 2) && (
+            {(cliente || (!cliente && currentStep === 2)) && (
               <div className="space-y-6">
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Faturamento</h3>
