@@ -280,16 +280,26 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
   };
 
   const canProceedToNextStep = () => {
-    if (currentStep === 1) {
-      const step1Fields = ['nomeFantasia', 'razaoSocial', 'cnpj', 'inscricaoEstadual', 'email', 'telefone', 'cep', 'rua', 'numero', 'bairro', 'cidade', 'uf'];
-      return step1Fields.every(field => form.getValues(field as keyof ClientFormData));
-    }
+    // Permite navegar para a próxima etapa sem validação
     return true;
   };
 
   const canFinalize = () => {
-    const tipoFaturamento = form.getValues("tipoFaturamento");
-    return !!tipoFaturamento;
+    // Valida todos os campos obrigatórios antes de finalizar
+    const step1Fields = ['nomeFantasia', 'razaoSocial', 'cnpj', 'inscricaoEstadual', 'email', 'telefone', 'cep', 'rua', 'numero', 'bairro', 'cidade', 'uf'];
+    const step2Fields = ['tipoFaturamento'];
+    
+    const allStep1Valid = step1Fields.every(field => {
+      const value = form.getValues(field as keyof ClientFormData);
+      return value && value.toString().trim().length > 0;
+    });
+    
+    const allStep2Valid = step2Fields.every(field => {
+      const value = form.getValues(field as keyof ClientFormData);
+      return value && value.toString().trim().length > 0;
+    });
+    
+    return allStep1Valid && allStep2Valid;
   };
 
   const handleFileUpload = (documentId: string, file: File) => {
@@ -802,7 +812,6 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                   <Button
                     type="button"
                     onClick={nextStep}
-                    disabled={!canProceedToNextStep()}
                   >
                     Próximo
                     <ArrowRight className="h-4 w-4 ml-2" />
