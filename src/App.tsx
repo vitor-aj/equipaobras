@@ -15,6 +15,7 @@ import Configuracoes from "./pages/Configuracoes";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import NotFound from "./pages/NotFound";
+import { ClientesProvider } from "./contexts/ClientesContext";
 
 const queryClient = new QueryClient();
 
@@ -51,9 +52,10 @@ const App = () => {
 
   // Se não estiver autenticado, mostrar telas de login
   if (!isAuthenticated) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <ClientesProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -63,8 +65,9 @@ const App = () => {
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
           </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
+        </ClientesProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
     );
   }
 
@@ -72,45 +75,47 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={
-              <AppLayout>
-                <Dashboard />
-              </AppLayout>
-            } />
-            <Route path="/clientes" element={
-              <AppLayout>
-                <Clientes />
-              </AppLayout>
-            } />
-            <Route path="/pedidos" element={
-              <AppLayout>
-                <Pedidos />
-              </AppLayout>
-            } />
-            <Route path="/pedidos/novo" element={
-              <AppLayout>
-                <NovoPedido />
-              </AppLayout>
-            } />
-            <Route path="/financeiro" element={
-              <AppLayout>
-                <Financeiro />
-              </AppLayout>
-            } />
-            <Route path="/configuracoes" element={
-              <AppLayout>
-                <Configuracoes />
-              </AppLayout>
-            } />
-            <Route path="/login" element={<Navigate to="/" replace />} />
-            <Route path="/forgot-password" element={<Navigate to="/" replace />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <ClientesProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={
+                <AppLayout>
+                  <Dashboard />
+                </AppLayout>
+              } />
+              <Route path="/clientes" element={
+                <AppLayout>
+                  <Clientes />
+                </AppLayout>
+              } />
+              <Route path="/pedidos" element={
+                <AppLayout>
+                  <Pedidos />
+                </AppLayout>
+              } />
+              <Route path="/pedidos/novo" element={
+                <AppLayout>
+                  <NovoPedido />
+                </AppLayout>
+              } />
+              <Route path="/financeiro" element={
+                <AppLayout>
+                  <Financeiro />
+                </AppLayout>
+              } />
+              <Route path="/configuracoes" element={
+                <AppLayout>
+                  <Configuracoes />
+                </AppLayout>
+              } />
+              <Route path="/login" element={<Navigate to="/" replace />} />
+              <Route path="/forgot-password" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </ClientesProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

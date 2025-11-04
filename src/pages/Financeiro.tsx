@@ -15,107 +15,40 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { ClientApprovalModal, ClienteAprovacao } from "@/components/financeiro/ClientApprovalModal";
+import { useClientes } from "@/contexts/ClientesContext";
+import { useToast } from "@/hooks/use-toast";
 
 const Financeiro = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCliente, setSelectedCliente] = useState<ClienteAprovacao | null>(null);
   const [showClientModal, setShowClientModal] = useState(false);
+  const { clientes, approveClienteFinanceiro, rejectClienteFinanceiro } = useClientes();
+  const { toast } = useToast();
 
-  // Mock data para clientes pendentes de aprovação
-  const clientesPendentes: ClienteAprovacao[] = [
-    {
-      id: "CLI-001",
-      nomeFantasia: "Tech Solutions Ltda",
-      razaoSocial: "Tech Solutions Tecnologia Ltda",
-      cnpj: "12.345.678/0001-90",
-      inscricaoEstadual: "123.456.789.012",
-      email: "contato@techsolutions.com",
-      telefone: "(11) 99999-8888",
-      endereco: {
-        cep: "01234-567",
-        rua: "Rua das Tecnologias",
-        numero: "123",
-        bairro: "Centro",
-        cidade: "São Paulo",
-        uf: "SP"
-      },
-      tipoFaturamento: "propria-empresa",
-      dataCadastro: "2024-01-15",
-      anexos: {
-        contratoSocial: "contrato_social_tech.pdf",
-        cartaoCnpj: "cartao_cnpj_tech.pdf",
-        notaFiscal1: "nf_001_tech.pdf",
-        notaFiscal2: "nf_002_tech.pdf",
-        notaFiscal3: "nf_003_tech.pdf"
-      },
-      analiseIA: {
-        status: "aprovado",
-        observacoes: "Todos os documentos estão em conformidade. CNPJ ativo na Receita Federal, inscrição estadual válida, notas fiscais com numeração sequencial e sem divergências. Empresa regularizada junto aos órgãos competentes.",
-        dataAnalise: "2024-01-15T10:30:00",
-        pontosAnalisados: [
-          "CNPJ válido e ativo na Receita Federal",
-          "Inscrição Estadual conferida e aprovada",
-          "Contrato social atualizado e registrado",
-          "Notas fiscais em ordem sequencial",
-          "Dados cadastrais consistentes",
-          "Documentos em formato adequado e legíveis"
-        ]
-      },
-      statusFinanceiro: "pendente"
-    },
-    {
-      id: "CLI-002", 
-      nomeFantasia: "Construções ABC",
-      razaoSocial: "ABC Construções e Engenharia Ltda",
-      cnpj: "98.765.432/0001-10",
-      inscricaoEstadual: "987.654.321.001",
-      email: "financeiro@construcoesabc.com",
-      telefone: "(11) 88888-7777",
-      endereco: {
-        cep: "04567-890",
-        rua: "Av. das Construções",
-        numero: "456",
-        bairro: "Industrial",
-        cidade: "São Paulo", 
-        uf: "SP"
-      },
-      tipoFaturamento: "contrato-obra",
-      empresaFaturamento: "Empresa A Ltda",
-      dataCadastro: "2024-01-14",
-      anexos: {
-        contratoSocial: "contrato_social_abc.pdf",
-        cartaoCnpj: "cartao_cnpj_abc.pdf", 
-        notaFiscal1: "nf_001_abc.pdf",
-        notaFiscal2: "nf_002_abc.pdf",
-        notaFiscal3: "nf_003_abc.pdf",
-        autorizacaoTerceiros: "autorizacao_terceiros_abc.pdf"
-      },
-      analiseIA: {
-        status: "aprovado",
-        observacoes: "Documentação completa incluindo autorização para faturamento de terceiros. Todas as validações foram aprovadas com sucesso.",
-        dataAnalise: "2024-01-14T14:20:00",
-        pontosAnalisados: [
-          "CNPJ válido e situação regular",
-          "Autorização de terceiros válida e assinada",
-          "Contrato entre empresas devidamente formalizado",
-          "Notas fiscais regulares",
-          "Inscrição estadual ativa"
-        ]
-      },
-      statusFinanceiro: "pendente"
-    }
-  ];
+  // Filtra apenas clientes pendentes de aprovação financeira
+  const clientesPendentes = clientes.filter(c => c.statusFinanceiro === "pendente");
 
   const filteredClientes = clientesPendentes.filter(cliente =>
-    cliente.statusFinanceiro === "pendente" &&
     (cliente.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
      cliente.nomeFantasia.toLowerCase().includes(searchTerm.toLowerCase()) ||
      cliente.cnpj.includes(searchTerm))
   );
 
   const handleClientAction = (clienteId: string, observacoes: string, action: "aprovar" | "rejeitar") => {
-    console.log(`${action === "aprovar" ? "Aprovando" : "Rejeitando"} cliente ${clienteId}`);
-    console.log("Observações:", observacoes);
+    if (action === "aprovar") {
+      approveClienteFinanceiro(clienteId, observacoes);
+      toast({
+        title: "Cliente Aprovado",
+        description: "O cliente foi aprovado com sucesso pelo financeiro.",
+      });
+    } else {
+      rejectClienteFinanceiro(clienteId, observacoes);
+      toast({
+        title: "Cliente Rejeitado",
+        description: "O cliente foi rejeitado. O motivo foi registrado.",
+        variant: "destructive",
+      });
+    }
     setShowClientModal(false);
     setSelectedCliente(null);
   };
