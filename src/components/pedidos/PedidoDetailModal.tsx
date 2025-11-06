@@ -50,8 +50,29 @@ export function PedidoDetailModal({ isOpen, onClose, onUpdateStatus, pedido }: P
     }
   };
 
+  const formatNotaFiscal = (value: string) => {
+    // Remove tudo que não é número
+    const numbers = value.replace(/\D/g, '');
+    
+    // Limita a 9 dígitos (padrão NF-e)
+    const limited = numbers.slice(0, 9);
+    
+    // Formata com separadores de milhar
+    if (limited.length === 0) return '';
+    
+    const formatted = limited.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return formatted;
+  };
+
+  const handleNotaFiscalChange = (value: string) => {
+    const formatted = formatNotaFiscal(value);
+    setNotaFiscal(formatted);
+  };
+
   const handleFaturar = () => {
-    if (!notaFiscal.trim()) {
+    const numeroLimpo = notaFiscal.replace(/\D/g, '');
+    
+    if (!numeroLimpo) {
       toast({
         title: "Erro",
         description: "Por favor, informe o número da nota fiscal.",
@@ -60,8 +81,17 @@ export function PedidoDetailModal({ isOpen, onClose, onUpdateStatus, pedido }: P
       return;
     }
 
+    if (numeroLimpo.length < 4) {
+      toast({
+        title: "Erro",
+        description: "O número da nota fiscal deve ter no mínimo 4 dígitos.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (onUpdateStatus) {
-      onUpdateStatus(pedido.id, "Pedido Faturado", notaFiscal);
+      onUpdateStatus(pedido.id, "Pedido Faturado", numeroLimpo);
     }
 
     toast({
@@ -231,17 +261,21 @@ export function PedidoDetailModal({ isOpen, onClose, onUpdateStatus, pedido }: P
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="notaFiscal">Número da Nota Fiscal</Label>
+                    <Label htmlFor="notaFiscal" className="text-sm font-medium">
+                      Número da Nota Fiscal
+                    </Label>
                     <Input
                       id="notaFiscal"
                       type="text"
-                      placeholder="Ex: 12345"
+                      placeholder="000.000.000"
                       value={notaFiscal}
-                      onChange={(e) => setNotaFiscal(e.target.value.replace(/\D/g, ''))}
-                      className="text-lg"
+                      onChange={(e) => handleNotaFiscalChange(e.target.value)}
+                      maxLength={11}
+                      className="text-lg font-mono"
+                      autoComplete="off"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Informe apenas números
+                      Informe de 4 a 9 dígitos • Apenas números
                     </p>
                   </div>
 
