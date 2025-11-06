@@ -40,6 +40,12 @@ import {
   Trash2
 } from "lucide-react";
 
+interface Material {
+  material: string;
+  quantidade: string;
+  valorUnitario: string;
+}
+
 interface Pedido {
   id: string;
   cliente: string;
@@ -48,6 +54,7 @@ interface Pedido {
   data: string;
   observacoes?: string;
   notaFiscal?: string;
+  materiais?: Material[];
 }
 
 const Pedidos = () => {
@@ -65,7 +72,12 @@ const Pedidos = () => {
       valor: "R$ 45.890,00",
       status: "Pendente",
       data: "2024-01-15",
-      observacoes: "Pedido urgente para obra do shopping"
+      observacoes: "Pedido urgente para obra do shopping",
+      materiais: [
+        { material: "Cimento", quantidade: "5000", valorUnitario: "R$ 0,65" },
+        { material: "Areia", quantidade: "150", valorUnitario: "R$ 95,00" },
+        { material: "Brita", quantidade: "100", valorUnitario: "R$ 130,00" }
+      ]
     },
     {
       id: "PED-002", 
@@ -129,11 +141,11 @@ const Pedidos = () => {
     setIsEditarPedidoModalOpen(true);
   };
 
-  const handleUpdatePedido = (pedidoId: string, data: { clienteId: string; valor: string; observacoes: string; cliente: string }) => {
+  const handleUpdatePedido = (pedidoId: string, data: { clienteId: string; valor: string; observacoes: string; cliente: string; materiais: Material[] }) => {
     setPedidos(prev => 
       prev.map(pedido => 
         pedido.id === pedidoId 
-          ? { ...pedido, cliente: data.cliente, valor: data.valor, observacoes: data.observacoes }
+          ? { ...pedido, cliente: data.cliente, valor: data.valor, observacoes: data.observacoes, materiais: data.materiais }
           : pedido
       )
     );
@@ -147,14 +159,15 @@ const Pedidos = () => {
     });
   };
 
-  const handleNovoPedido = (data: { clienteId: string; valor: string; observacoes: string; cliente: string }) => {
+  const handleNovoPedido = (data: { clienteId: string; valor: string; observacoes: string; cliente: string; materiais: Material[] }) => {
     const novoPedido: Pedido = {
       id: `PED-${String(Date.now()).slice(-3)}`,
       cliente: data.cliente,
       valor: data.valor,
       status: "Pendente",
       data: new Date().toISOString().split('T')[0],
-      observacoes: data.observacoes || undefined
+      observacoes: data.observacoes || undefined,
+      materiais: data.materiais || []
     };
 
     setPedidos(prev => [novoPedido, ...prev]);
