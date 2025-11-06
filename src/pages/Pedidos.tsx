@@ -24,6 +24,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { PedidoDetailModal } from "@/components/pedidos/PedidoDetailModal";
 import { NovoPedidoModal } from "@/components/pedidos/NovoPedidoModal";
+import { EditarPedidoModal } from "@/components/pedidos/EditarPedidoModal";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Plus, 
@@ -56,6 +57,7 @@ const Pedidos = () => {
   const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isNovoPedidoModalOpen, setIsNovoPedidoModalOpen] = useState(false);
+  const [isEditarPedidoModalOpen, setIsEditarPedidoModalOpen] = useState(false);
   const [pedidos, setPedidos] = useState<Pedido[]>([
     {
       id: "PED-001",
@@ -123,10 +125,18 @@ const Pedidos = () => {
   };
 
   const handleEditPedido = (pedido: Pedido) => {
-    toast({
-      title: "Editar Pedido",
-      description: `Funcionalidade de edição do pedido ${pedido.id} será implementada em breve.`,
-    });
+    setSelectedPedido(pedido);
+    setIsEditarPedidoModalOpen(true);
+  };
+
+  const handleUpdatePedido = (pedidoId: string, data: { clienteId: string; valor: string; observacoes: string; cliente: string }) => {
+    setPedidos(prev => 
+      prev.map(pedido => 
+        pedido.id === pedidoId 
+          ? { ...pedido, cliente: data.cliente, valor: data.valor, observacoes: data.observacoes }
+          : pedido
+      )
+    );
   };
 
   const handleDeletePedido = (id: string) => {
@@ -467,6 +477,17 @@ const Pedidos = () => {
         isOpen={isNovoPedidoModalOpen}
         onClose={() => setIsNovoPedidoModalOpen(false)}
         onSubmit={handleNovoPedido}
+      />
+
+      {/* Modal de Editar Pedido */}
+      <EditarPedidoModal
+        isOpen={isEditarPedidoModalOpen}
+        onClose={() => {
+          setIsEditarPedidoModalOpen(false);
+          setSelectedPedido(null);
+        }}
+        onSubmit={handleUpdatePedido}
+        pedido={selectedPedido}
       />
     </div>
   );
