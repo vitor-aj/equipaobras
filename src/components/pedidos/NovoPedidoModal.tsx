@@ -311,13 +311,17 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel>
-                                    Quantidade {materialSelecionado && `(${materialSelecionado.unidade})`}
+                                    {materialSelecionado ? (
+                                      <>Quantidade em {materialSelecionado.unidade}</>
+                                    ) : (
+                                      <>Quantidade</>
+                                    )}
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       type="number"
                                       step="0.01"
-                                      placeholder="0"
+                                      placeholder={materialSelecionado ? `0 ${materialSelecionado.unidade}` : "0"}
                                       {...field}
                                     />
                                   </FormControl>
@@ -332,7 +336,13 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
                               rules={{ required: "Digite o valor unitário" }}
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Valor Unitário</FormLabel>
+                                  <FormLabel>
+                                    {materialSelecionado ? (
+                                      <>Valor por {materialSelecionado.unidade}</>
+                                    ) : (
+                                      <>Valor Unitário</>
+                                    )}
+                                  </FormLabel>
                                   <FormControl>
                                     <Input
                                       placeholder="R$ 0,00"
