@@ -77,7 +77,8 @@ const Pedidos = () => {
       cliente: "Edificações Norte",
       valor: "R$ 67.230,00", 
       status: "Pedido Faturado",
-      data: "2024-01-13"
+      data: "2024-01-13",
+      notaFiscal: "123456789"
     },
     {
       id: "PED-004",
@@ -92,7 +93,8 @@ const Pedidos = () => {
       cliente: "Construtora ABC Ltda", 
       valor: "R$ 89.450,00",
       status: "Pedido Faturado",
-      data: "2024-01-10"
+      data: "2024-01-10",
+      notaFiscal: "987654321"
     }
   ]);
 
