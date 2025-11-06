@@ -31,22 +31,22 @@ import { useClientes } from "@/contexts/ClientesContext";
 import { Building2, DollarSign, FileText, Info, MapPin, Phone, Mail, Package, Plus, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-// Materiais de construção com unidades padronizadas
+// Materiais de construção com unidades padronizadas e preços fictícios
 const MATERIAIS = [
-  { nome: "Cimento", unidade: "kg" },
-  { nome: "Areia", unidade: "m³" },
-  { nome: "Brita", unidade: "m³" },
-  { nome: "Tijolo", unidade: "unidade" },
-  { nome: "Bloco de Concreto", unidade: "unidade" },
-  { nome: "Ferro 6mm", unidade: "kg" },
-  { nome: "Ferro 8mm", unidade: "kg" },
-  { nome: "Ferro 10mm", unidade: "kg" },
-  { nome: "Cal", unidade: "kg" },
-  { nome: "Telha Cerâmica", unidade: "unidade" },
-  { nome: "Madeira", unidade: "m³" },
-  { nome: "Tinta", unidade: "litros" },
-  { nome: "Argamassa", unidade: "kg" },
-  { nome: "Piso Cerâmico", unidade: "m²" },
+  { nome: "Cimento", unidade: "kg", precoUnitario: 0.85 },
+  { nome: "Areia", unidade: "m³", precoUnitario: 120.00 },
+  { nome: "Brita", unidade: "m³", precoUnitario: 150.00 },
+  { nome: "Tijolo", unidade: "unidade", precoUnitario: 0.75 },
+  { nome: "Bloco de Concreto", unidade: "unidade", precoUnitario: 3.50 },
+  { nome: "Ferro 6mm", unidade: "kg", precoUnitario: 6.80 },
+  { nome: "Ferro 8mm", unidade: "kg", precoUnitario: 7.20 },
+  { nome: "Ferro 10mm", unidade: "kg", precoUnitario: 7.80 },
+  { nome: "Cal", unidade: "kg", precoUnitario: 0.65 },
+  { nome: "Telha Cerâmica", unidade: "unidade", precoUnitario: 4.50 },
+  { nome: "Madeira", unidade: "m³", precoUnitario: 850.00 },
+  { nome: "Tinta", unidade: "litros", precoUnitario: 85.00 },
+  { nome: "Argamassa", unidade: "kg", precoUnitario: 0.95 },
+  { nome: "Piso Cerâmico", unidade: "m²", precoUnitario: 45.00 },
 ];
 
 interface Material {
@@ -284,7 +284,20 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Material</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value}>
+                                <Select 
+                                  onValueChange={(value) => {
+                                    field.onChange(value);
+                                    const material = MATERIAIS.find(m => m.nome === value);
+                                    if (material) {
+                                      const precoFormatado = new Intl.NumberFormat('pt-BR', {
+                                        style: 'currency',
+                                        currency: 'BRL'
+                                      }).format(material.precoUnitario);
+                                      form.setValue(`materiais.${index}.valorUnitario`, precoFormatado);
+                                    }
+                                  }} 
+                                  value={field.value}
+                                >
                                   <FormControl>
                                     <SelectTrigger>
                                       <SelectValue placeholder="Selecione o material" />
