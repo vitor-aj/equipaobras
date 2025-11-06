@@ -2,7 +2,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { WorkflowStatus } from "./WorkflowStatus";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { 
   FileText, 
   Building2, 
@@ -10,12 +14,14 @@ import {
   DollarSign,
   MessageSquare,
   Download,
-  X
+  X,
+  Receipt
 } from "lucide-react";
 
 interface PedidoDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onUpdateStatus?: (pedidoId: string, novoStatus: "Pedido Faturado" | "Pendente", notaFiscal: string) => void;
   pedido: {
     id: string;
     cliente: string;
@@ -26,7 +32,11 @@ interface PedidoDetailModalProps {
   } | null;
 }
 
-export function PedidoDetailModal({ isOpen, onClose, pedido }: PedidoDetailModalProps) {
+export function PedidoDetailModal({ isOpen, onClose, onUpdateStatus, pedido }: PedidoDetailModalProps) {
+  const { toast } = useToast();
+  const [showFaturamentoForm, setShowFaturamentoForm] = useState(false);
+  const [notaFiscal, setNotaFiscal] = useState("");
+
   if (!pedido) return null;
 
   const getCurrentStep = () => {
@@ -38,6 +48,30 @@ export function PedidoDetailModal({ isOpen, onClose, pedido }: PedidoDetailModal
       default:
         return 1;
     }
+  };
+
+  const handleFaturar = () => {
+    if (!notaFiscal.trim()) {
+      toast({
+        title: "Erro",
+        description: "Por favor, informe o número da nota fiscal.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (onUpdateStatus) {
+      onUpdateStatus(pedido.id, "Pedido Faturado", notaFiscal);
+    }
+
+    toast({
+      title: "Pedido Faturado",
+      description: `Pedido ${pedido.id} foi faturado com sucesso. NF: ${notaFiscal}`,
+    });
+
+    setShowFaturamentoForm(false);
+    setNotaFiscal("");
+    onClose();
   };
 
   const hasError = false;
@@ -142,31 +176,101 @@ export function PedidoDetailModal({ isOpen, onClose, pedido }: PedidoDetailModal
 
           <Separator />
 
-          {/* Documentos */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground">Documentos Anexados</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {documents.map((document, index) => (
-                <div 
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-card border border-border rounded-lg hover:bg-muted/30 transition-fast"
-                >
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">{document}</span>
+          {/* Documentos ou Faturamento */}
+          {pedido.status === "Pedido Faturado" && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-foreground">Documentos Anexados</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {documents.map((document, index) => (
+                  <div 
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-card border border-border rounded-lg hover:bg-muted/30 transition-fast"
+                  >
+                    <div className="flex items-center gap-3">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium text-foreground">{document}</span>
+                    </div>
+                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                      <Download className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                    <Download className="h-4 w-4" />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {pedido.status === "Pendente" && (
+            <div className="space-y-4">
+              {!showFaturamentoForm ? (
+                <div className="flex flex-col items-center gap-4 p-6 bg-muted/30 rounded-lg border border-border">
+                  <Receipt className="h-12 w-12 text-primary" />
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                      Faturar Pedido
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Clique no botão abaixo para informar o número da nota fiscal e faturar este pedido.
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => setShowFaturamentoForm(true)}
+                    className="w-full max-w-xs"
+                  >
+                    <Receipt className="h-4 w-4 mr-2" />
+                    Faturar Pedido
                   </Button>
                 </div>
-              ))}
+              ) : (
+                <div className="space-y-4 p-6 bg-muted/30 rounded-lg border border-border">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Receipt className="h-5 w-5 text-primary" />
+                    <h3 className="text-lg font-semibold text-foreground">
+                      Informações de Faturamento
+                    </h3>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="notaFiscal">Número da Nota Fiscal</Label>
+                    <Input
+                      id="notaFiscal"
+                      type="text"
+                      placeholder="Ex: 12345"
+                      value={notaFiscal}
+                      onChange={(e) => setNotaFiscal(e.target.value.replace(/\D/g, ''))}
+                      className="text-lg"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Informe apenas números
+                    </p>
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowFaturamentoForm(false);
+                        setNotaFiscal("");
+                      }}
+                      className="flex-1"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={handleFaturar}
+                      className="flex-1"
+                    >
+                      Confirmar Faturamento
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
           {/* Ações */}
           <div className="flex gap-3 pt-4 border-t border-border">
-            <Button onClick={onClose} className="flex-1">
+            <Button onClick={onClose} variant="outline" className="flex-1">
               Fechar
             </Button>
           </div>

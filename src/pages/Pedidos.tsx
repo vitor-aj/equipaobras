@@ -147,6 +147,16 @@ const Pedidos = () => {
     setPedidos(prev => [novoPedido, ...prev]);
   };
 
+  const handleUpdateStatus = (pedidoId: string, novoStatus: "Pedido Faturado" | "Pendente", notaFiscal: string) => {
+    setPedidos(prev => 
+      prev.map(pedido => 
+        pedido.id === pedidoId 
+          ? { ...pedido, status: novoStatus }
+          : pedido
+      )
+    );
+  };
+
   const statusCounts = {
     total: pedidos.length,
     pendentes: pedidos.filter(p => p.status === "Pendente").length,
@@ -445,6 +455,7 @@ const Pedidos = () => {
           setIsDetailModalOpen(false);
           setSelectedPedido(null);
         }}
+        onUpdateStatus={handleUpdateStatus}
         pedido={selectedPedido}
       />
 
