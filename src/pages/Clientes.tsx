@@ -147,7 +147,7 @@ const Clientes = () => {
             Gestão de Clientes
           </h1>
           <p className="text-muted-foreground mt-1">
-            Cadastre e gerencie informações dos clientes
+            Analise de cadastro de clientes
           </p>
         </div>
         
