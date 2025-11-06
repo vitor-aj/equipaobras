@@ -23,7 +23,7 @@ export function WorkflowStatus({ currentStep, hasError, errorMessage }: Workflow
     },
     {
       id: 2,
-      title: "Concluído",
+      title: "Pedido Faturado",
       description: "Pedido finalizado",
       status: currentStep === 2 ? "completed" : "pending"
     }
@@ -143,7 +143,7 @@ export function WorkflowStatus({ currentStep, hasError, errorMessage }: Workflow
         </div>
         <p className="text-sm text-muted-foreground">
           {currentStep === 1 && "Pedido aguardando processamento e análise."}
-          {currentStep === 2 && "Pedido foi concluído com sucesso."}
+          {currentStep === 2 && "Pedido faturado com sucesso."}
         </p>
       </div>
     </div>

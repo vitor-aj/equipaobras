@@ -20,7 +20,7 @@ interface PedidoDetailModalProps {
     id: string;
     cliente: string;
     valor: string;
-    status: "Concluído" | "Pendente";
+    status: "Pedido Faturado" | "Pendente";
     data: string;
     observacoes?: string;
   } | null;
@@ -33,7 +33,7 @@ export function PedidoDetailModal({ isOpen, onClose, pedido }: PedidoDetailModal
     switch (pedido.status) {
       case "Pendente":
         return 1;
-      case "Concluído":
+      case "Pedido Faturado":
         return 2;
       default:
         return 1;

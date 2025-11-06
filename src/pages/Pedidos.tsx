@@ -43,7 +43,7 @@ interface Pedido {
   id: string;
   cliente: string;
   valor: string;
-  status: "Concluído" | "Pendente";
+  status: "Pedido Faturado" | "Pendente";
   data: string;
   observacoes?: string;
 }
@@ -75,7 +75,7 @@ const Pedidos = () => {
       id: "PED-003",
       cliente: "Edificações Norte",
       valor: "R$ 67.230,00", 
-      status: "Concluído",
+      status: "Pedido Faturado",
       data: "2024-01-13"
     },
     {
@@ -90,7 +90,7 @@ const Pedidos = () => {
       id: "PED-005",
       cliente: "Construtora ABC Ltda", 
       valor: "R$ 89.450,00",
-      status: "Concluído",
+      status: "Pedido Faturado",
       data: "2024-01-10"
     }
   ]);
@@ -105,7 +105,7 @@ const Pedidos = () => {
   const getStatusBadge = (status: Pedido["status"]) => {
     const variants = {
       "Pendente": { variant: "secondary" as const, icon: Clock, className: "bg-orange-500/10 text-orange-700 border-orange-500/20" },
-      "Concluído": { variant: "default" as const, icon: CheckCircle, className: "bg-success/10 text-success border-success/20" }
+      "Pedido Faturado": { variant: "default" as const, icon: CheckCircle, className: "bg-success/10 text-success border-success/20" }
     };
     
     const config = variants[status];
@@ -150,7 +150,7 @@ const Pedidos = () => {
   const statusCounts = {
     total: pedidos.length,
     pendentes: pedidos.filter(p => p.status === "Pendente").length,
-    concluidos: pedidos.filter(p => p.status === "Concluído").length
+    concluidos: pedidos.filter(p => p.status === "Pedido Faturado").length
   };
 
   return (
@@ -203,7 +203,7 @@ const Pedidos = () => {
             <div className="flex items-center gap-2">
               <CheckCircle className="h-8 w-8 text-green-600" />
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase">Concluídos</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase">Faturados</p>
                 <p className="text-xl font-bold text-foreground">{statusCounts.concluidos}</p>
               </div>
             </div>
@@ -234,7 +234,7 @@ const Pedidos = () => {
               >
                 <option value="todos">Todos os Status</option>
                 <option value="Pendente">Pendentes</option>
-                <option value="Concluído">Concluídos</option>
+                <option value="Pedido Faturado">Faturados</option>
               </select>
             </div>
           </div>
