@@ -357,10 +357,8 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
                                     <Input
                                       placeholder="R$ 0,00"
                                       {...field}
-                                      onChange={(e) => {
-                                        const formatted = formatCurrency(e.target.value);
-                                        form.setValue(`materiais.${index}.valorUnitario`, formatted);
-                                      }}
+                                      readOnly
+                                      className="bg-muted"
                                     />
                                   </FormControl>
                                   <FormMessage />
