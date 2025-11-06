@@ -12,25 +12,28 @@ import {
   Building, 
   DollarSign, 
   FileText,
-  ChevronDown
+  ChevronDown,
+  MapPin,
+  Phone,
+  Mail
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useClientes } from "@/contexts/ClientesContext";
 
 const NovoPedido = () => {
   const navigate = useNavigate();
+  const { clientes: todosClientes } = useClientes();
   const [formData, setFormData] = useState({
     cliente: "",
     valor: "",
     observacoes: ""
   });
 
-  // Mock data - apenas clientes aprovados
-  const clientes = [
-    { id: "1", nome: "ABC Construtora", status: "Aprovado" },
-    { id: "4", nome: "Reforma Total", status: "Aprovado" },
-    { id: "7", nome: "Obras Primas Ltda", status: "Aprovado" },
-    { id: "9", nome: "Construtora Alfa", status: "Aprovado" }
-  ].filter(c => c.status === "Aprovado");
+  // Apenas clientes aprovados
+  const clientesAprovados = todosClientes.filter(c => c.status === "Aprovado");
+  
+  // Cliente selecionado
+  const clienteSelecionado = clientesAprovados.find(c => c.id === formData.cliente);
 
   const handleSubmit = (action: "save" | "send") => {
     // Aqui seria integrado com Supabase para salvar/enviar o pedido
@@ -93,9 +96,9 @@ const NovoPedido = () => {
                     className="w-full h-10 px-3 py-2 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring appearance-none cursor-pointer"
                   >
                     <option value="">Selecione um cliente...</option>
-                    {clientes.map(cliente => (
+                    {clientesAprovados.map(cliente => (
                       <option key={cliente.id} value={cliente.id}>
-                        {cliente.nome}
+                        {cliente.nomeFantasia}
                       </option>
                     ))}
                   </select>
@@ -157,6 +160,59 @@ const NovoPedido = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Dados do Cliente Selecionado */}
+          {clienteSelecionado && (
+            <Card className="shadow-custom-md border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building className="h-5 w-5 text-primary" />
+                  Dados do Cliente
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Razão Social</p>
+                  <p className="text-sm font-medium text-foreground">{clienteSelecionado.razaoSocial}</p>
+                </div>
+                
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">CNPJ</p>
+                  <p className="text-sm font-medium text-foreground">{clienteSelecionado.cnpj}</p>
+                </div>
+                
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Endereço</p>
+                    <p className="text-sm text-foreground">
+                      {clienteSelecionado.endereco.rua}, {clienteSelecionado.endereco.numero}
+                    </p>
+                    <p className="text-sm text-foreground">
+                      {clienteSelecionado.endereco.bairro} - {clienteSelecionado.endereco.cidade}/{clienteSelecionado.endereco.uf}
+                    </p>
+                    <p className="text-sm text-foreground">CEP: {clienteSelecionado.endereco.cep}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Telefone</p>
+                    <p className="text-sm text-foreground">{clienteSelecionado.telefone}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">E-mail</p>
+                    <p className="text-sm text-foreground">{clienteSelecionado.email}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Status Card */}
           <Card className="shadow-custom-md border-border">
