@@ -31,22 +31,22 @@ import { useClientes } from "@/contexts/ClientesContext";
 import { Building2, DollarSign, FileText, Info, MapPin, Phone, Mail, Package, Plus, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-// Materiais de construção com unidades padronizadas e preços fictícios
+// Materiais de construção com unidades padronizadas e preços reais de mercado
 const MATERIAIS = [
-  { nome: "Cimento", unidade: "kg", precoUnitario: 0.85 },
-  { nome: "Areia", unidade: "m³", precoUnitario: 120.00 },
-  { nome: "Brita", unidade: "m³", precoUnitario: 150.00 },
-  { nome: "Tijolo", unidade: "unidade", precoUnitario: 0.75 },
-  { nome: "Bloco de Concreto", unidade: "unidade", precoUnitario: 3.50 },
-  { nome: "Ferro 6mm", unidade: "kg", precoUnitario: 6.80 },
-  { nome: "Ferro 8mm", unidade: "kg", precoUnitario: 7.20 },
-  { nome: "Ferro 10mm", unidade: "kg", precoUnitario: 7.80 },
-  { nome: "Cal", unidade: "kg", precoUnitario: 0.65 },
-  { nome: "Telha Cerâmica", unidade: "unidade", precoUnitario: 4.50 },
-  { nome: "Madeira", unidade: "m³", precoUnitario: 850.00 },
-  { nome: "Tinta", unidade: "litros", precoUnitario: 85.00 },
-  { nome: "Argamassa", unidade: "kg", precoUnitario: 0.95 },
-  { nome: "Piso Cerâmico", unidade: "m²", precoUnitario: 45.00 },
+  { nome: "Cimento", unidade: "kg", precoUnitario: 0.65 },
+  { nome: "Areia", unidade: "m³", precoUnitario: 95.00 },
+  { nome: "Brita", unidade: "m³", precoUnitario: 130.00 },
+  { nome: "Tijolo", unidade: "unidade", precoUnitario: 0.85 },
+  { nome: "Bloco de Concreto", unidade: "unidade", precoUnitario: 4.20 },
+  { nome: "Ferro 6mm", unidade: "kg", precoUnitario: 7.50 },
+  { nome: "Ferro 8mm", unidade: "kg", precoUnitario: 7.80 },
+  { nome: "Ferro 10mm", unidade: "kg", precoUnitario: 8.20 },
+  { nome: "Cal", unidade: "kg", precoUnitario: 0.55 },
+  { nome: "Telha Cerâmica", unidade: "unidade", precoUnitario: 5.20 },
+  { nome: "Madeira", unidade: "m³", precoUnitario: 1200.00 },
+  { nome: "Tinta", unidade: "litros", precoUnitario: 92.00 },
+  { nome: "Argamassa", unidade: "kg", precoUnitario: 1.10 },
+  { nome: "Piso Cerâmico", unidade: "m²", precoUnitario: 38.50 },
 ];
 
 interface Material {
@@ -268,9 +268,6 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
 
               {fields.map((field, index) => {
                 const materialSelecionado = MATERIAIS.find(m => m.nome === form.watch(`materiais.${index}.material`));
-                const quantidade = parseFloat(form.watch(`materiais.${index}.quantidade`)) || 0;
-                const valorUnitario = parseFloat(form.watch(`materiais.${index}.valorUnitario`)?.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-                const total = quantidade * valorUnitario;
 
                 return (
                   <Card key={field.id} className="shadow-sm border-border">
@@ -371,18 +368,6 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
                               )}
                             />
                           </div>
-
-                          {materialSelecionado && quantidade > 0 && valorUnitario > 0 && (
-                            <div className="flex items-center justify-between p-3 bg-muted rounded-md">
-                              <span className="text-sm font-medium text-muted-foreground">Total:</span>
-                              <span className="text-lg font-semibold text-foreground">
-                                {new Intl.NumberFormat('pt-BR', {
-                                  style: 'currency',
-                                  currency: 'BRL'
-                                }).format(total)}
-                              </span>
-                            </div>
-                          )}
                         </div>
 
                         {fields.length > 1 && (
@@ -403,27 +388,48 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
               })}
             </div>
 
-            {/* Valor Total do Pedido */}
+            {/* Valor Total do Pedido - Calculado Automaticamente */}
             <FormField
               control={form.control}
               name="valor"
               rules={{ required: "Digite o valor do pedido" }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    Valor Total do Pedido
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="R$ 0,00"
-                      {...field}
-                      onChange={handleValueChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                // Calcular total automaticamente
+                const totalCalculado = fields.reduce((acc, _, index) => {
+                  const quantidade = parseFloat(form.watch(`materiais.${index}.quantidade`)) || 0;
+                  const valorUnitario = parseFloat(form.watch(`materiais.${index}.valorUnitario`)?.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+                  return acc + (quantidade * valorUnitario);
+                }, 0);
+
+                const valorFormatado = new Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL'
+                }).format(totalCalculado);
+
+                // Atualizar o campo automaticamente
+                if (field.value !== valorFormatado && totalCalculado > 0) {
+                  form.setValue('valor', valorFormatado);
+                }
+
+                return (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      Valor Total do Pedido
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="R$ 0,00"
+                        {...field}
+                        value={valorFormatado}
+                        readOnly
+                        className="bg-muted font-semibold text-lg"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
 
             {/* Observações */}
