@@ -46,6 +46,7 @@ interface Pedido {
   status: "Pedido Faturado" | "Pendente";
   data: string;
   observacoes?: string;
+  notaFiscal?: string;
 }
 
 const Pedidos = () => {
@@ -151,7 +152,7 @@ const Pedidos = () => {
     setPedidos(prev => 
       prev.map(pedido => 
         pedido.id === pedidoId 
-          ? { ...pedido, status: novoStatus }
+          ? { ...pedido, status: novoStatus, notaFiscal }
           : pedido
       )
     );

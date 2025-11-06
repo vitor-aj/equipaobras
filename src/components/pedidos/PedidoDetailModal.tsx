@@ -13,7 +13,6 @@ import {
   Calendar, 
   DollarSign,
   MessageSquare,
-  Download,
   X,
   Receipt
 } from "lucide-react";
@@ -29,6 +28,7 @@ interface PedidoDetailModalProps {
     status: "Pedido Faturado" | "Pendente";
     data: string;
     observacoes?: string;
+    notaFiscal?: string;
   } | null;
 }
 
@@ -106,17 +106,6 @@ export function PedidoDetailModal({ isOpen, onClose, onUpdateStatus, pedido }: P
 
   const hasError = false;
   const errorMessage = undefined;
-
-  const documents = [
-    "Ficha Cadastral",
-    "Contrato Social", 
-    "Cartão CNPJ",
-    "Nota Fiscal 1",
-    "Nota Fiscal 2",
-    "Nota Fiscal 3",
-    "Autorização/Carta de Terceiros",
-    "Pedido de Compras"
-  ];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -206,26 +195,26 @@ export function PedidoDetailModal({ isOpen, onClose, onUpdateStatus, pedido }: P
 
           <Separator />
 
-          {/* Documentos ou Faturamento */}
-          {pedido.status === "Pedido Faturado" && (
+          {/* Nota Fiscal ou Faturamento */}
+          {pedido.status === "Pedido Faturado" && pedido.notaFiscal && (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground">Documentos Anexados</h3>
+              <div className="flex items-center gap-2">
+                <Receipt className="h-5 w-5 text-primary" />
+                <h3 className="text-lg font-semibold text-foreground">Nota Fiscal</h3>
+              </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {documents.map((document, index) => (
-                  <div 
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-card border border-border rounded-lg hover:bg-muted/30 transition-fast"
-                  >
-                    <div className="flex items-center gap-3">
-                      <FileText className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium text-foreground">{document}</span>
-                    </div>
-                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                      <Download className="h-4 w-4" />
-                    </Button>
+              <div className="p-6 bg-muted/30 rounded-lg border border-border">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Número da Nota Fiscal</p>
+                    <p className="text-2xl font-mono font-semibold text-foreground">
+                      {formatNotaFiscal(pedido.notaFiscal)}
+                    </p>
                   </div>
-                ))}
+                  <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <Receipt className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
               </div>
             </div>
           )}
