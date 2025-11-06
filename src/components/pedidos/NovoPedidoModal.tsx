@@ -27,15 +27,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, DollarSign, FileText, Info } from "lucide-react";
-
-interface Cliente {
-  id: string;
-  nomeFantasia: string;
-  razaoSocial: string;
-  status: "Aprovado" | "Análise da IA" | "Reprovado";
-  empresaFaturamento?: string;
-}
+import { useClientes } from "@/contexts/ClientesContext";
+import { Building2, DollarSign, FileText, Info, MapPin, Phone, Mail } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface NovoPedidoData {
   clienteId: string;
@@ -51,36 +45,14 @@ interface NovoPedidoModalProps {
 
 export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalProps) => {
   const { toast } = useToast();
-  const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
-
-  // Mock de clientes aprovados - em produção viria de uma API
-  const clientesAtivos: Cliente[] = [
-    {
-      id: "1",
-      nomeFantasia: "ABC Construtora",
-      razaoSocial: "ABC Construtora Ltda",
-      status: "Aprovado"
-    },
-    {
-      id: "4", 
-      nomeFantasia: "Reforma Total",
-      razaoSocial: "Reforma Total Construções Ltda",
-      status: "Aprovado"
-    },
-    {
-      id: "7",
-      nomeFantasia: "Obras Primas Ltda",
-      razaoSocial: "Obras Primas Construções e Reformas Ltda",
-      status: "Aprovado",
-      empresaFaturamento: "Empresa C ME"
-    },
-    {
-      id: "9",
-      nomeFantasia: "Construtora Alfa",
-      razaoSocial: "Alfa Construções e Empreendimentos Ltda",
-      status: "Aprovado"
-    }
-  ];
+  const { clientes: todosClientes } = useClientes();
+  
+  // Apenas clientes aprovados
+  const clientesAprovados = todosClientes.filter(c => c.status === "Aprovado");
+  const [selectedClienteId, setSelectedClienteId] = useState<string>("");
+  
+  // Cliente selecionado
+  const clienteSelecionado = clientesAprovados.find(c => c.id === selectedClienteId);
 
   const form = useForm<NovoPedidoData>({
     defaultValues: {
@@ -91,12 +63,11 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
   });
 
   const handleClienteChange = (clienteId: string) => {
-    const cliente = clientesAtivos.find(c => c.id === clienteId);
-    setSelectedCliente(cliente || null);
+    setSelectedClienteId(clienteId);
   };
 
   const handleSubmit = (data: NovoPedidoData) => {
-    const cliente = clientesAtivos.find(c => c.id === data.clienteId);
+    const cliente = clientesAprovados.find(c => c.id === data.clienteId);
     if (!cliente) return;
 
     // Gerar ID único para o pedido
@@ -114,7 +85,7 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
 
     // Reset form and close modal
     form.reset();
-    setSelectedCliente(null);
+    setSelectedClienteId("");
     onClose();
   };
 
@@ -138,7 +109,7 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary" />
@@ -175,12 +146,9 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {clientesAtivos.map((cliente) => (
+                      {clientesAprovados.map((cliente) => (
                         <SelectItem key={cliente.id} value={cliente.id}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{cliente.nomeFantasia}</span>
-                            <span className="text-xs text-muted-foreground">{cliente.razaoSocial}</span>
-                          </div>
+                          {cliente.nomeFantasia}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -190,17 +158,57 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
               )}
             />
 
-            {/* Informações de Faturamento */}
-            {selectedCliente?.empresaFaturamento && (
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Faturamento:</strong> O faturamento será realizado para a empresa{" "}
-                  <span className="font-semibold text-primary">
-                    {selectedCliente.empresaFaturamento}
-                  </span>
-                </AlertDescription>
-              </Alert>
+            {/* Dados do Cliente Selecionado */}
+            {clienteSelecionado && (
+              <Card className="shadow-sm border-border">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Building2 className="h-4 w-4 text-primary" />
+                    Dados do Cliente
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Razão Social</p>
+                    <p className="font-medium text-foreground">{clienteSelecionado.razaoSocial}</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">CNPJ</p>
+                    <p className="font-medium text-foreground">{clienteSelecionado.cnpj}</p>
+                  </div>
+                  
+                  <div className="flex items-start gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Endereço</p>
+                      <p className="text-foreground">
+                        {clienteSelecionado.endereco.rua}, {clienteSelecionado.endereco.numero}
+                      </p>
+                      <p className="text-foreground">
+                        {clienteSelecionado.endereco.bairro} - {clienteSelecionado.endereco.cidade}/{clienteSelecionado.endereco.uf}
+                      </p>
+                      <p className="text-foreground">CEP: {clienteSelecionado.endereco.cep}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Telefone</p>
+                      <p className="text-foreground">{clienteSelecionado.telefone}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">E-mail</p>
+                      <p className="text-foreground">{clienteSelecionado.email}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             )}
 
             {/* Valor do Pedido */}
