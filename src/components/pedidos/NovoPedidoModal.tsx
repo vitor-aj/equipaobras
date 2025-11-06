@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import {
   Dialog,
   DialogContent,
@@ -28,13 +28,38 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { useClientes } from "@/contexts/ClientesContext";
-import { Building2, DollarSign, FileText, Info, MapPin, Phone, Mail } from "lucide-react";
+import { Building2, DollarSign, FileText, Info, MapPin, Phone, Mail, Package, Plus, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+// Materiais de construção com unidades padronizadas
+const MATERIAIS = [
+  { nome: "Cimento", unidade: "kg" },
+  { nome: "Areia", unidade: "m³" },
+  { nome: "Brita", unidade: "m³" },
+  { nome: "Tijolo", unidade: "unidade" },
+  { nome: "Bloco de Concreto", unidade: "unidade" },
+  { nome: "Ferro 6mm", unidade: "kg" },
+  { nome: "Ferro 8mm", unidade: "kg" },
+  { nome: "Ferro 10mm", unidade: "kg" },
+  { nome: "Cal", unidade: "kg" },
+  { nome: "Telha Cerâmica", unidade: "unidade" },
+  { nome: "Madeira", unidade: "m³" },
+  { nome: "Tinta", unidade: "litros" },
+  { nome: "Argamassa", unidade: "kg" },
+  { nome: "Piso Cerâmico", unidade: "m²" },
+];
+
+interface Material {
+  material: string;
+  quantidade: string;
+  valorUnitario: string;
+}
 
 interface NovoPedidoData {
   clienteId: string;
   valor: string;
   observacoes: string;
+  materiais: Material[];
 }
 
 interface NovoPedidoModalProps {
@@ -58,8 +83,14 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
     defaultValues: {
       clienteId: "",
       valor: "",
-      observacoes: ""
+      observacoes: "",
+      materiais: [{ material: "", quantidade: "", valorUnitario: "" }]
     }
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "materiais"
   });
 
   const handleClienteChange = (clienteId: string) => {
@@ -84,7 +115,12 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
     });
 
     // Reset form and close modal
-    form.reset();
+    form.reset({
+      clienteId: "",
+      valor: "",
+      observacoes: "",
+      materiais: [{ material: "", quantidade: "", valorUnitario: "" }]
+    });
     setSelectedClienteId("");
     onClose();
   };
@@ -211,7 +247,140 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
               </Card>
             )}
 
-            {/* Valor do Pedido */}
+            {/* Materiais */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <FormLabel className="flex items-center gap-2 text-base">
+                  <Package className="h-4 w-4" />
+                  Materiais
+                </FormLabel>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => append({ material: "", quantidade: "", valorUnitario: "" })}
+                  className="flex items-center gap-1"
+                >
+                  <Plus className="h-4 w-4" />
+                  Adicionar Material
+                </Button>
+              </div>
+
+              {fields.map((field, index) => {
+                const materialSelecionado = MATERIAIS.find(m => m.nome === form.watch(`materiais.${index}.material`));
+                const quantidade = parseFloat(form.watch(`materiais.${index}.quantidade`)) || 0;
+                const valorUnitario = parseFloat(form.watch(`materiais.${index}.valorUnitario`)?.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+                const total = quantidade * valorUnitario;
+
+                return (
+                  <Card key={field.id} className="shadow-sm border-border">
+                    <CardContent className="pt-6 space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-1 space-y-4">
+                          <FormField
+                            control={form.control}
+                            name={`materiais.${index}.material`}
+                            rules={{ required: "Selecione um material" }}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Material</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Selecione o material" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {MATERIAIS.map((material) => (
+                                      <SelectItem key={material.nome} value={material.nome}>
+                                        {material.nome} ({material.unidade})
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <div className="grid grid-cols-2 gap-3">
+                            <FormField
+                              control={form.control}
+                              name={`materiais.${index}.quantidade`}
+                              rules={{ required: "Digite a quantidade" }}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>
+                                    Quantidade {materialSelecionado && `(${materialSelecionado.unidade})`}
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="number"
+                                      step="0.01"
+                                      placeholder="0"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`materiais.${index}.valorUnitario`}
+                              rules={{ required: "Digite o valor unitário" }}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Valor Unitário</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="R$ 0,00"
+                                      {...field}
+                                      onChange={(e) => {
+                                        const formatted = formatCurrency(e.target.value);
+                                        form.setValue(`materiais.${index}.valorUnitario`, formatted);
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                          {materialSelecionado && quantidade > 0 && valorUnitario > 0 && (
+                            <div className="flex items-center justify-between p-3 bg-muted rounded-md">
+                              <span className="text-sm font-medium text-muted-foreground">Total:</span>
+                              <span className="text-lg font-semibold text-foreground">
+                                {new Intl.NumberFormat('pt-BR', {
+                                  style: 'currency',
+                                  currency: 'BRL'
+                                }).format(total)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {fields.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            onClick={() => remove(index)}
+                            className="flex-shrink-0"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Valor Total do Pedido */}
             <FormField
               control={form.control}
               name="valor"
@@ -220,7 +389,7 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
                 <FormItem>
                   <FormLabel className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    Valor do Pedido
+                    Valor Total do Pedido
                   </FormLabel>
                   <FormControl>
                     <Input
