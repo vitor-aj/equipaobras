@@ -5,8 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Camera, Save, User, Mail, Phone, Lock } from "lucide-react";
+import { Camera, Save, User, Mail, Phone, Lock, Briefcase } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Configuracoes() {
   const { toast } = useToast();
@@ -15,6 +16,7 @@ export default function Configuracoes() {
     nome: "João Silva",
     email: "joao.silva@exemplo.com",
     telefone: "(11) 99999-9999",
+    tipoUsuario: "vendas",
     foto: "",
     senhaAtual: "",
     novaSenha: "",
@@ -165,6 +167,25 @@ export default function Configuracoes() {
                       className="pl-10"
                       placeholder="(11) 99999-9999"
                     />
+                  </div>
+                </div>
+
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="tipo-usuario">Tipo de Usuário</Label>
+                  <div className="relative">
+                    <Briefcase className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                    <Select 
+                      value={profile.tipoUsuario} 
+                      onValueChange={(value) => handleInputChange('tipoUsuario', value)}
+                    >
+                      <SelectTrigger id="tipo-usuario" className="pl-10">
+                        <SelectValue placeholder="Selecione o tipo de usuário" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="vendas">Vendas</SelectItem>
+                        <SelectItem value="financeiro">Financeiro</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
