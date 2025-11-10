@@ -267,8 +267,6 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
               </div>
 
               {fields.map((field, index) => {
-                const materialSelecionado = MATERIAIS.find(m => m.nome === form.watch(`materiais.${index}.material`));
-
                 return (
                   <Card key={field.id} className="shadow-sm border-border">
                     <CardContent className="pt-6 space-y-4">
@@ -277,37 +275,16 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
                           <FormField
                             control={form.control}
                             name={`materiais.${index}.material`}
-                            rules={{ required: "Selecione um material" }}
+                            rules={{ required: "Digite o nome do material" }}
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Material</FormLabel>
-                                <Select 
-                                  onValueChange={(value) => {
-                                    field.onChange(value);
-                                    const material = MATERIAIS.find(m => m.nome === value);
-                                    if (material) {
-                                      const precoFormatado = new Intl.NumberFormat('pt-BR', {
-                                        style: 'currency',
-                                        currency: 'BRL'
-                                      }).format(material.precoUnitario);
-                                      form.setValue(`materiais.${index}.valorUnitario`, precoFormatado);
-                                    }
-                                  }} 
-                                  value={field.value}
-                                >
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Selecione o material" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {MATERIAIS.map((material) => (
-                                      <SelectItem key={material.nome} value={material.nome}>
-                                        {material.nome} ({material.unidade})
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
+                                <FormControl>
+                                  <Input
+                                    placeholder="Digite o nome do material"
+                                    {...field}
+                                  />
+                                </FormControl>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -320,18 +297,12 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
                               rules={{ required: "Digite a quantidade" }}
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>
-                                    {materialSelecionado ? (
-                                      <>Quantidade em {materialSelecionado.unidade}</>
-                                    ) : (
-                                      <>Quantidade</>
-                                    )}
-                                  </FormLabel>
+                                  <FormLabel>Quantidade</FormLabel>
                                   <FormControl>
                                     <Input
                                       type="number"
                                       step="0.01"
-                                      placeholder={materialSelecionado ? `0 ${materialSelecionado.unidade}` : "0"}
+                                      placeholder="0"
                                       {...field}
                                     />
                                   </FormControl>
@@ -346,19 +317,15 @@ export const NovoPedidoModal = ({ isOpen, onClose, onSubmit }: NovoPedidoModalPr
                               rules={{ required: "Digite o valor unitário" }}
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>
-                                    {materialSelecionado ? (
-                                      <>Valor por {materialSelecionado.unidade}</>
-                                    ) : (
-                                      <>Valor Unitário</>
-                                    )}
-                                  </FormLabel>
+                                  <FormLabel>Valor Unitário</FormLabel>
                                   <FormControl>
                                     <Input
                                       placeholder="R$ 0,00"
                                       {...field}
-                                      readOnly
-                                      className="bg-muted"
+                                      onChange={(e) => {
+                                        const formatted = formatCurrency(e.target.value);
+                                        field.onChange(formatted);
+                                      }}
                                     />
                                   </FormControl>
                                   <FormMessage />
