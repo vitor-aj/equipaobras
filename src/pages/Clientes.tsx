@@ -39,11 +39,15 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { ClientModal, Cliente } from "@/components/clientes/ClientModal";
+import { ClientDetailModal } from "@/components/clientes/ClientDetailModal";
+import { ClienteAprovacao } from "@/contexts/ClientesContext";
 
 const Clientes = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
+  const [viewingCliente, setViewingCliente] = useState<ClienteAprovacao | null>(null);
   const { clientes, addCliente, updateCliente, deleteCliente } = useClientes();
 
   const filteredClientes = clientes.filter(cliente =>
@@ -114,6 +118,11 @@ const Clientes = () => {
 
   const handleDeleteCliente = (id: string) => {
     deleteCliente(id);
+  };
+
+  const handleViewCliente = (cliente: ClienteAprovacao) => {
+    setViewingCliente(cliente);
+    setIsDetailModalOpen(true);
   };
 
   const getStatusBadge = (status: Cliente["status"]) => {
@@ -269,17 +278,15 @@ const Clientes = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-2">
-                      {cliente.status === "Reprovado" && (
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-600 hover:bg-blue-50"
-                          onClick={() => handleEditCliente(cliente)}
-                          title="Visualizar detalhes e corrigir"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      )}
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0 text-blue-600 hover:text-blue-600 hover:bg-blue-50"
+                        onClick={() => handleViewCliente(cliente)}
+                        title="Visualizar todos os dados"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
                       <Button 
                         variant="ghost" 
                         size="sm" 
@@ -354,17 +361,15 @@ const Clientes = () => {
               </div>
               
               <div className="flex items-center gap-2">
-                {cliente.status === "Reprovado" && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="flex-1 text-blue-600 hover:text-blue-600 hover:bg-blue-50"
-                    onClick={() => handleEditCliente(cliente)}
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    Visualizar
-                  </Button>
-                )}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1 text-blue-600 hover:text-blue-600 hover:bg-blue-50"
+                  onClick={() => handleViewCliente(cliente)}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Ver Dados
+                </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -421,7 +426,7 @@ const Clientes = () => {
         </div>
       )}
 
-      {/* Modal */}
+      {/* Modal de Edição */}
       <ClientModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -430,6 +435,16 @@ const Clientes = () => {
         }}
         onSave={handleSaveCliente}
         cliente={editingCliente}
+      />
+
+      {/* Modal de Visualização Completa */}
+      <ClientDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setViewingCliente(null);
+        }}
+        cliente={viewingCliente}
       />
     </div>
   );
