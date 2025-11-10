@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ClienteAprovacao } from "@/contexts/ClientesContext";
@@ -298,6 +299,17 @@ export const ClientDetailModal = ({ isOpen, onClose, cliente }: ClientDetailModa
                     autorizacaoTerceiros: "Autorização de Terceiros"
                   };
 
+                  const handleDownload = () => {
+                    const link = document.createElement('a');
+                    link.href = value;
+                    link.download = labels[key];
+                    link.click();
+                  };
+
+                  const handleView = () => {
+                    window.open(value, '_blank');
+                  };
+
                   return (
                     <div 
                       key={key} 
@@ -307,6 +319,26 @@ export const ClientDetailModal = ({ isOpen, onClose, cliente }: ClientDetailModa
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{labels[key]}</p>
                         <p className="text-xs text-muted-foreground truncate">{value}</p>
+                      </div>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleView}
+                          className="h-8 w-8 p-0"
+                          title="Visualizar documento"
+                        >
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleDownload}
+                          className="h-8 w-8 p-0"
+                          title="Baixar documento"
+                        >
+                          <Paperclip className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   );
