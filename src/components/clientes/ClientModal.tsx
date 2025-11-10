@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -197,23 +197,64 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
   const form = useForm<ClientFormData>({
     resolver: zodResolver(clientSchema),
     defaultValues: {
-      nomeFantasia: cliente?.nomeFantasia || "",
-      razaoSocial: cliente?.razaoSocial || "",
-      cnpj: cliente?.cnpj || "",
-      inscricaoEstadual: cliente?.inscricaoEstadual || "",
-      email: cliente?.email || "",
-      telefone: cliente?.telefone || "",
-      cep: cliente?.cep || "",
-      rua: cliente?.rua || "",
-      numero: cliente?.numero || "",
-      bairro: cliente?.bairro || "",
-      cidade: cliente?.cidade || "",
-      uf: cliente?.uf || "",
-      tipoFaturamento: cliente?.tipoFaturamento || "",
-      empresaFaturamento: cliente?.empresaFaturamento || "",
-      status: cliente?.status || "Análise da IA",
+      nomeFantasia: "",
+      razaoSocial: "",
+      cnpj: "",
+      inscricaoEstadual: "",
+      email: "",
+      telefone: "",
+      cep: "",
+      rua: "",
+      numero: "",
+      bairro: "",
+      cidade: "",
+      uf: "",
+      tipoFaturamento: "",
+      empresaFaturamento: "",
+      status: "Análise da IA",
     },
   });
+  
+  // Atualiza o formulário quando o cliente muda
+  useEffect(() => {
+    if (cliente) {
+      form.reset({
+        nomeFantasia: cliente.nomeFantasia,
+        razaoSocial: cliente.razaoSocial,
+        cnpj: cliente.cnpj,
+        inscricaoEstadual: cliente.inscricaoEstadual,
+        email: cliente.email,
+        telefone: cliente.telefone,
+        cep: cliente.cep,
+        rua: cliente.rua,
+        numero: cliente.numero,
+        bairro: cliente.bairro,
+        cidade: cliente.cidade,
+        uf: cliente.uf,
+        tipoFaturamento: cliente.tipoFaturamento || "",
+        empresaFaturamento: cliente.empresaFaturamento || "",
+        status: cliente.status,
+      });
+    } else {
+      form.reset({
+        nomeFantasia: "",
+        razaoSocial: "",
+        cnpj: "",
+        inscricaoEstadual: "",
+        email: "",
+        telefone: "",
+        cep: "",
+        rua: "",
+        numero: "",
+        bairro: "",
+        cidade: "",
+        uf: "",
+        tipoFaturamento: "",
+        empresaFaturamento: "",
+        status: "Análise da IA",
+      });
+    }
+  }, [cliente, form]);
   
   const watchTipoFaturamento = form.watch("tipoFaturamento");
   const currentDocumentTypes = tiposFaturamento.find(t => t.id === watchTipoFaturamento)?.documentos || [];
@@ -623,7 +664,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Status *</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Selecione o status" />
@@ -655,7 +696,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Selecione o Tipo de Faturamento *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione o tipo de faturamento" />
@@ -681,7 +722,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Empresa que será Faturada</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Selecione a empresa" />
