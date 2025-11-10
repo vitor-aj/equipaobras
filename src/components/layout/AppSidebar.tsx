@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, FileText, Settings, Building2, ChevronRight, UserCheck, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, FileText, UserCircle, Building2, ChevronRight, UserCheck, LogOut } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarFooter } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -20,9 +20,9 @@ const menuItems = [{
   url: "/financeiro",
   icon: UserCheck
 }, {
-  title: "Configurações",
+  title: "Perfil do Usuário",
   url: "/configuracoes",
-  icon: Settings
+  icon: UserCircle
 }];
 interface AppSidebarProps {
   onLogout?: () => void;
