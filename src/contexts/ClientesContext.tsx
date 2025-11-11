@@ -130,9 +130,8 @@ export const ClientesProvider = ({ children }: ClientesProviderProps) => {
         autorizacaoTerceiros: "autorizacao_terceiros.pdf",
       },
       analiseIA: {
-        status: "aprovado",
-        observacoes: "Documentação completa incluindo autorização para faturamento de terceiros.",
-        dataAnalise: "2024-01-14T14:20:00",
+        status: "pendente",
+        observacoes: "Documentação completa incluindo autorização para faturamento de terceiros. Aguardando análise do financeiro.",
         pontosAnalisados: [
           "CNPJ válido e situação regular",
           "Autorização de terceiros válida",
@@ -245,9 +244,8 @@ export const ClientesProvider = ({ children }: ClientesProviderProps) => {
         notaFiscal3: "nf_003_mega.pdf",
       },
       analiseIA: {
-        status: "aprovado",
-        observacoes: "Documentação completa e em ordem.",
-        dataAnalise: "2024-01-15T09:00:00",
+        status: "pendente",
+        observacoes: "Documentação completa e em ordem. Aguardando análise do financeiro.",
         pontosAnalisados: [
           "CNPJ ativo",
           "Documentos válidos",
@@ -362,9 +360,8 @@ export const ClientesProvider = ({ children }: ClientesProviderProps) => {
         notaFiscal3: "nf_003_steel.pdf",
       },
       analiseIA: {
-        status: "aprovado",
-        observacoes: "Mesmos sócios verificados e documentação regular.",
-        dataAnalise: "2024-01-16T10:30:00",
+        status: "pendente",
+        observacoes: "Mesmos sócios verificados e documentação regular. Aguardando análise do financeiro.",
         pontosAnalisados: [
           "CNPJ válido",
           "Sócios em comum confirmados",
@@ -481,9 +478,8 @@ export const ClientesProvider = ({ children }: ClientesProviderProps) => {
         notaFiscal3: "nf_003.pdf",
       },
       analiseIA: {
-        status: "aprovado",
-        observacoes: "Análise automática aprovada. Aguardando aprovação do financeiro.",
-        dataAnalise: new Date().toISOString(),
+        status: "pendente",
+        observacoes: "Análise inicial concluída. Aguardando aprovação do financeiro.",
         pontosAnalisados: [
           "CNPJ válido",
           "Documentação recebida",
