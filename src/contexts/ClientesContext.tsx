@@ -134,9 +134,9 @@ export const ClientesProvider = ({ children }: ClientesProviderProps) => {
         observacoes: "Documentação completa incluindo autorização para faturamento de terceiros. Aguardando análise do financeiro.",
         pontosAnalisados: [
           "CNPJ válido e situação regular",
-          "Autorização de terceiros válida",
-          "Contrato entre empresas formalizado",
-          "Notas fiscais regulares"
+          "Autorização de terceiros - aguardando validação",
+          "Contrato entre empresas - em análise",
+          "Notas fiscais - verificação pendente"
         ],
       },
       statusFinanceiro: "pendente",
@@ -247,9 +247,9 @@ export const ClientesProvider = ({ children }: ClientesProviderProps) => {
         status: "pendente",
         observacoes: "Documentação completa e em ordem. Aguardando análise do financeiro.",
         pontosAnalisados: [
-          "CNPJ ativo",
-          "Documentos válidos",
-          "Notas fiscais regulares"
+          "CNPJ ativo e verificado",
+          "Documentos - aguardando validação final",
+          "Notas fiscais - em processo de verificação"
         ],
       },
       statusFinanceiro: "pendente",
@@ -363,9 +363,9 @@ export const ClientesProvider = ({ children }: ClientesProviderProps) => {
         status: "pendente",
         observacoes: "Mesmos sócios verificados e documentação regular. Aguardando análise do financeiro.",
         pontosAnalisados: [
-          "CNPJ válido",
-          "Sócios em comum confirmados",
-          "Documentos em ordem"
+          "CNPJ válido e ativo",
+          "Sócios em comum - validação pendente",
+          "Documentos - análise em andamento"
         ],
       },
       statusFinanceiro: "pendente",
@@ -481,9 +481,9 @@ export const ClientesProvider = ({ children }: ClientesProviderProps) => {
         status: "pendente",
         observacoes: "Análise inicial concluída. Aguardando aprovação do financeiro.",
         pontosAnalisados: [
-          "CNPJ válido",
-          "Documentação recebida",
-          "Dados cadastrais completos"
+          "CNPJ válido e verificado",
+          "Documentação recebida - em análise",
+          "Dados cadastrais - validação pendente"
         ],
       },
       statusFinanceiro: "pendente",
