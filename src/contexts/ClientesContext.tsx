@@ -39,13 +39,21 @@ export interface ClienteAprovacao {
   motivoReprovacao?: string;
 }
 
+interface EmpresaFornecedora {
+  id: string;
+  nome: string;
+  cnpj?: string;
+}
+
 interface ClientesContextData {
   clientes: ClienteAprovacao[];
+  empresasFornecedoras: EmpresaFornecedora[];
   addCliente: (cliente: Cliente) => void;
   updateCliente: (cliente: ClienteAprovacao) => void;
   deleteCliente: (id: string) => void;
   approveClienteFinanceiro: (clienteId: string, observacoes: string) => void;
   rejectClienteFinanceiro: (clienteId: string, observacoes: string) => void;
+  addEmpresaFornecedora: (empresa: Omit<EmpresaFornecedora, "id">) => void;
 }
 
 const ClientesContext = createContext<ClientesContextData>({} as ClientesContextData);
@@ -63,6 +71,12 @@ interface ClientesProviderProps {
 }
 
 export const ClientesProvider = ({ children }: ClientesProviderProps) => {
+  const [empresasFornecedoras, setEmpresasFornecedoras] = useState<EmpresaFornecedora[]>([
+    { id: "1", nome: "Empresa A Ltda", cnpj: "11.111.111/0001-11" },
+    { id: "2", nome: "Empresa B S.A.", cnpj: "22.222.222/0001-22" },
+    { id: "3", nome: "Empresa C ME", cnpj: "33.333.333/0001-33" },
+  ]);
+
   const [clientes, setClientes] = useState<ClienteAprovacao[]>([
     {
       id: "1",
@@ -533,15 +547,25 @@ export const ClientesProvider = ({ children }: ClientesProviderProps) => {
     }));
   };
 
+  const addEmpresaFornecedora = (empresa: Omit<EmpresaFornecedora, "id">) => {
+    const novaEmpresa: EmpresaFornecedora = {
+      id: Date.now().toString(),
+      ...empresa,
+    };
+    setEmpresasFornecedoras(prev => [...prev, novaEmpresa]);
+  };
+
   return (
     <ClientesContext.Provider
       value={{
         clientes,
+        empresasFornecedoras,
         addCliente,
         updateCliente,
         deleteCliente,
         approveClienteFinanceiro,
         rejectClienteFinanceiro,
+        addEmpresaFornecedora,
       }}
     >
       {children}
