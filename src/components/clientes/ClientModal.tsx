@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, FileText, X, ArrowLeft, ArrowRight, CheckCircle, AlertCircle, RotateCcw, Plus } from "lucide-react";
+import { Upload, FileText, X, ArrowLeft, ArrowRight, CheckCircle, AlertCircle, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useClientes } from "@/contexts/ClientesContext";
 
@@ -187,11 +187,8 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, AnexoFile>>({});
   const [showSuccess, setShowSuccess] = useState(false);
-  const [showNovaEmpresa, setShowNovaEmpresa] = useState(false);
-  const [novaEmpresaNome, setNovaEmpresaNome] = useState("");
-  const [novaEmpresaCnpj, setNovaEmpresaCnpj] = useState("");
   const { toast } = useToast();
-  const { empresasFornecedoras, addEmpresaFornecedora } = useClientes();
+  const { empresasFornecedoras } = useClientes();
   
   const form = useForm<ClientFormData>({
     resolver: zodResolver(clientSchema),
@@ -715,110 +712,35 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                   />
 
                   {(watchTipoFaturamento === "contrato-obra" || watchTipoFaturamento === "carta-autorizacao" || watchTipoFaturamento === "mesmos-socios") && (
-                    <div className="space-y-3">
-                      <FormField
-                        control={form.control}
-                        name="empresaFaturamento"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Empresa que será Faturada</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecione a empresa" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {empresasFornecedoras.map((empresa) => (
-                                  <SelectItem key={empresa.id} value={empresa.nome}>
-                                    {empresa.nome} {empresa.cnpj && `(${empresa.cnpj})`}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      {!showNovaEmpresa ? (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowNovaEmpresa(true)}
-                          className="w-full"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Cadastrar Nova Empresa Fornecedora
-                        </Button>
-                      ) : (
-                        <Card className="border-primary/20 bg-primary/5">
-                          <CardHeader className="pb-3">
-                            <CardTitle className="text-sm flex items-center justify-between">
-                              <span>Nova Empresa Fornecedora</span>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setShowNovaEmpresa(false);
-                                  setNovaEmpresaNome("");
-                                  setNovaEmpresaCnpj("");
-                                }}
-                                className="h-6 w-6 p-0"
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-3">
-                            <div className="space-y-2">
-                              <FormLabel className="text-xs">Nome da Empresa *</FormLabel>
-                              <Input
-                                placeholder="Nome da empresa fornecedora"
-                                value={novaEmpresaNome}
-                                onChange={(e) => setNovaEmpresaNome(e.target.value)}
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <FormLabel className="text-xs">CNPJ (opcional)</FormLabel>
-                              <Input
-                                placeholder="00.000.000/0000-00"
-                                value={novaEmpresaCnpj}
-                                onChange={(e) => setNovaEmpresaCnpj(formatCNPJ(e.target.value))}
-                                maxLength={18}
-                              />
-                            </div>
-                            <Button
-                              type="button"
-                              size="sm"
-                              onClick={() => {
-                                if (novaEmpresaNome.trim()) {
-                                  addEmpresaFornecedora({
-                                    nome: novaEmpresaNome.trim(),
-                                    cnpj: novaEmpresaCnpj.trim() || undefined,
-                                  });
-                                  form.setValue("empresaFaturamento", novaEmpresaNome.trim());
-                                  setNovaEmpresaNome("");
-                                  setNovaEmpresaCnpj("");
-                                  setShowNovaEmpresa(false);
-                                  toast({
-                                    title: "Empresa Cadastrada!",
-                                    description: "A empresa fornecedora foi adicionada e já está selecionada.",
-                                  });
-                                }
-                              }}
-                              disabled={!novaEmpresaNome.trim()}
-                              className="w-full"
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              Cadastrar e Selecionar
-                            </Button>
-                          </CardContent>
-                        </Card>
+                    <FormField
+                      control={form.control}
+                      name="empresaFaturamento"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Empresa que será Faturada</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione a empresa" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {empresasFornecedoras.map((empresa) => (
+                                <SelectItem key={empresa.id} value={empresa.nome}>
+                                  {empresa.nome} {empresa.cnpj && `(${empresa.cnpj})`}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {empresasFornecedoras.length === 0 && (
+                            <p className="text-xs text-muted-foreground">
+                              Nenhuma empresa cadastrada. Cadastre empresas em "Empresas" no menu lateral.
+                            </p>
+                          )}
+                          <FormMessage />
+                        </FormItem>
                       )}
-                    </div>
+                    />
                   )}
                 </div>
 
