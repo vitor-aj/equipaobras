@@ -43,6 +43,16 @@ interface EmpresaFornecedora {
   id: string;
   nome: string;
   cnpj?: string;
+  razaoSocial?: string;
+  inscricaoEstadual?: string;
+  email?: string;
+  telefone?: string;
+  cep?: string;
+  rua?: string;
+  numero?: string;
+  bairro?: string;
+  cidade?: string;
+  uf?: string;
 }
 
 interface ClientesContextData {
