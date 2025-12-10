@@ -1,8 +1,18 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   Table,
   TableBody,
@@ -16,7 +26,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Building2, Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { useClientes } from "@/contexts/ClientesContext";
@@ -34,14 +43,81 @@ const formatCNPJ = (value: string) => {
   return value;
 };
 
+const formatInscricaoEstadual = (value: string) => {
+  const numbers = value.replace(/\D/g, '');
+  if (numbers.length <= 12) {
+    return numbers
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2');
+  }
+  return value;
+};
+
+const formatTelefone = (value: string) => {
+  const numbers = value.replace(/\D/g, '');
+  if (numbers.length <= 11) {
+    if (numbers.length <= 10) {
+      return numbers
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{4})(\d)/, '$1-$2');
+    }
+    return numbers
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{5})(\d)/, '$1-$2');
+  }
+  return value;
+};
+
+const formatCEP = (value: string) => {
+  const numbers = value.replace(/\D/g, '');
+  if (numbers.length <= 8) {
+    return numbers.replace(/(\d{5})(\d)/, '$1-$2');
+  }
+  return value;
+};
+
+const empresaSchema = z.object({
+  nomeFantasia: z.string().min(1, "Nome fantasia é obrigatório"),
+  razaoSocial: z.string().min(1, "Razão social é obrigatória"),
+  cnpj: z.string().min(14, "CNPJ deve ter pelo menos 14 caracteres"),
+  inscricaoEstadual: z.string().min(1, "Inscrição estadual é obrigatória"),
+  email: z.string().email("Email inválido"),
+  telefone: z.string().min(10, "Telefone deve ter pelo menos 10 caracteres"),
+  cep: z.string().min(8, "CEP é obrigatório"),
+  rua: z.string().min(1, "Rua é obrigatória"),
+  numero: z.string().min(1, "Número é obrigatório"),
+  bairro: z.string().min(1, "Bairro é obrigatório"),
+  cidade: z.string().min(1, "Cidade é obrigatória"),
+  uf: z.string().min(2, "UF é obrigatória"),
+});
+
+type EmpresaFormData = z.infer<typeof empresaSchema>;
+
 const Empresas = () => {
   const { empresasFornecedoras, addEmpresaFornecedora, updateEmpresaFornecedora, deleteEmpresaFornecedora } = useClientes();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingEmpresa, setEditingEmpresa] = useState<{ id: string; nome: string; cnpj?: string } | null>(null);
-  const [nome, setNome] = useState("");
-  const [cnpj, setCnpj] = useState("");
+  const [editingEmpresaId, setEditingEmpresaId] = useState<string | null>(null);
+
+  const form = useForm<EmpresaFormData>({
+    resolver: zodResolver(empresaSchema),
+    defaultValues: {
+      nomeFantasia: "",
+      razaoSocial: "",
+      cnpj: "",
+      inscricaoEstadual: "",
+      email: "",
+      telefone: "",
+      cep: "",
+      rua: "",
+      numero: "",
+      bairro: "",
+      cidade: "",
+      uf: "",
+    },
+  });
 
   const filteredEmpresas = empresasFornecedoras.filter(
     (empresa) =>
@@ -49,40 +125,64 @@ const Empresas = () => {
       (empresa.cnpj && empresa.cnpj.includes(searchTerm))
   );
 
-  const handleOpenModal = (empresa?: { id: string; nome: string; cnpj?: string }) => {
+  const handleOpenModal = (empresa?: { id: string; nome: string; cnpj?: string; razaoSocial?: string; inscricaoEstadual?: string; email?: string; telefone?: string; cep?: string; rua?: string; numero?: string; bairro?: string; cidade?: string; uf?: string }) => {
     if (empresa) {
-      setEditingEmpresa(empresa);
-      setNome(empresa.nome);
-      setCnpj(empresa.cnpj || "");
+      setEditingEmpresaId(empresa.id);
+      form.reset({
+        nomeFantasia: empresa.nome,
+        razaoSocial: empresa.razaoSocial || "",
+        cnpj: empresa.cnpj || "",
+        inscricaoEstadual: empresa.inscricaoEstadual || "",
+        email: empresa.email || "",
+        telefone: empresa.telefone || "",
+        cep: empresa.cep || "",
+        rua: empresa.rua || "",
+        numero: empresa.numero || "",
+        bairro: empresa.bairro || "",
+        cidade: empresa.cidade || "",
+        uf: empresa.uf || "",
+      });
     } else {
-      setEditingEmpresa(null);
-      setNome("");
-      setCnpj("");
+      setEditingEmpresaId(null);
+      form.reset({
+        nomeFantasia: "",
+        razaoSocial: "",
+        cnpj: "",
+        inscricaoEstadual: "",
+        email: "",
+        telefone: "",
+        cep: "",
+        rua: "",
+        numero: "",
+        bairro: "",
+        cidade: "",
+        uf: "",
+      });
     }
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setEditingEmpresa(null);
-    setNome("");
-    setCnpj("");
+    setEditingEmpresaId(null);
+    form.reset();
   };
 
-  const handleSave = () => {
-    if (!nome.trim()) {
-      toast({
-        title: "Erro",
-        description: "O nome da empresa é obrigatório.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (editingEmpresa) {
-      updateEmpresaFornecedora(editingEmpresa.id, {
-        nome: nome.trim(),
-        cnpj: cnpj.trim() || undefined,
+  const onSubmit = (data: EmpresaFormData) => {
+    if (editingEmpresaId) {
+      updateEmpresaFornecedora(editingEmpresaId, {
+        nome: data.nomeFantasia,
+        cnpj: data.cnpj,
+        razaoSocial: data.razaoSocial,
+        inscricaoEstadual: data.inscricaoEstadual,
+        email: data.email,
+        telefone: data.telefone,
+        cep: data.cep,
+        rua: data.rua,
+        numero: data.numero,
+        bairro: data.bairro,
+        cidade: data.cidade,
+        uf: data.uf,
       });
       toast({
         title: "Empresa Atualizada",
@@ -90,8 +190,18 @@ const Empresas = () => {
       });
     } else {
       addEmpresaFornecedora({
-        nome: nome.trim(),
-        cnpj: cnpj.trim() || undefined,
+        nome: data.nomeFantasia,
+        cnpj: data.cnpj,
+        razaoSocial: data.razaoSocial,
+        inscricaoEstadual: data.inscricaoEstadual,
+        email: data.email,
+        telefone: data.telefone,
+        cep: data.cep,
+        rua: data.rua,
+        numero: data.numero,
+        bairro: data.bairro,
+        cidade: data.cidade,
+        uf: data.uf,
       });
       toast({
         title: "Empresa Cadastrada",
@@ -118,51 +228,239 @@ const Empresas = () => {
             Gerencie as empresas disponíveis para faturamento
           </p>
         </div>
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => handleOpenModal()}>
-              <Plus className="h-4 w-4 mr-2" />
-              Nova Empresa
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {editingEmpresa ? "Editar Empresa" : "Nova Empresa Fornecedora"}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label htmlFor="nome">Nome da Empresa *</Label>
-                <Input
-                  id="nome"
-                  placeholder="Nome da empresa fornecedora"
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                />
+        <Button onClick={() => handleOpenModal()}>
+          <Plus className="h-4 w-4 mr-2" />
+          Nova Empresa
+        </Button>
+      </div>
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">
+              {editingEmpresaId ? "Editar Empresa" : "Nova Empresa Fornecedora"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Dados da Empresa</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="nomeFantasia"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nome Fantasia *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nome fantasia da empresa" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="razaoSocial"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Razão Social *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Razão social da empresa" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="cnpj"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>CNPJ *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="00.000.000/0000-00" 
+                            {...field}
+                            onChange={(e) => {
+                              const formatted = formatCNPJ(e.target.value);
+                              field.onChange(formatted);
+                            }}
+                            maxLength={18}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="inscricaoEstadual"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Inscrição Estadual *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="000.000.000.000" 
+                            {...field}
+                            onChange={(e) => {
+                              const formatted = formatInscricaoEstadual(e.target.value);
+                              field.onChange(formatted);
+                            }}
+                            maxLength={15}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email de Contato *</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="contato@empresa.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="telefone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Telefone de Contato *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="(00) 00000-0000" 
+                            {...field}
+                            onChange={(e) => {
+                              const formatted = formatTelefone(e.target.value);
+                              field.onChange(formatted);
+                            }}
+                            maxLength={15}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="cep"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>CEP *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="00000-000" 
+                            {...field}
+                            onChange={(e) => {
+                              const formatted = formatCEP(e.target.value);
+                              field.onChange(formatted);
+                            }}
+                            maxLength={9}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="rua"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Rua *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nome da rua" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="numero"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Número *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="123" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="bairro"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bairro *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nome do bairro" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="cidade"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cidade *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nome da cidade" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="uf"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>UF *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="SP" maxLength={2} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="cnpj">CNPJ (opcional)</Label>
-                <Input
-                  id="cnpj"
-                  placeholder="00.000.000/0000-00"
-                  value={cnpj}
-                  onChange={(e) => setCnpj(formatCNPJ(e.target.value))}
-                  maxLength={18}
-                />
-              </div>
+
               <div className="flex gap-2 pt-4">
-                <Button variant="outline" onClick={handleCloseModal} className="flex-1">
+                <Button type="button" variant="outline" onClick={handleCloseModal} className="flex-1">
                   Cancelar
                 </Button>
-                <Button onClick={handleSave} className="flex-1">
-                  {editingEmpresa ? "Salvar Alterações" : "Cadastrar"}
+                <Button type="submit" className="flex-1">
+                  {editingEmpresaId ? "Salvar Alterações" : "Cadastrar Empresa"}
                 </Button>
               </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <Card>
         <CardHeader>
@@ -193,8 +491,9 @@ const Empresas = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nome</TableHead>
+                  <TableHead>Nome Fantasia</TableHead>
                   <TableHead>CNPJ</TableHead>
+                  <TableHead>Cidade/UF</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -203,6 +502,11 @@ const Empresas = () => {
                   <TableRow key={empresa.id}>
                     <TableCell className="font-medium">{empresa.nome}</TableCell>
                     <TableCell>{empresa.cnpj || "-"}</TableCell>
+                    <TableCell>
+                      {empresa.cidade && empresa.uf 
+                        ? `${empresa.cidade}/${empresa.uf}` 
+                        : "-"}
+                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button
