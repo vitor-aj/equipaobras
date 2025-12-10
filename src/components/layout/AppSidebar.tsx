@@ -8,6 +8,10 @@ const menuItems = [{
   url: "/",
   icon: LayoutDashboard
 }, {
+  title: "Empresas",
+  url: "/empresas",
+  icon: Building2
+}, {
   title: "Clientes",
   url: "/clientes",
   icon: Users

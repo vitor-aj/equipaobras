@@ -54,6 +54,8 @@ interface ClientesContextData {
   approveClienteFinanceiro: (clienteId: string, observacoes: string) => void;
   rejectClienteFinanceiro: (clienteId: string, observacoes: string) => void;
   addEmpresaFornecedora: (empresa: Omit<EmpresaFornecedora, "id">) => void;
+  updateEmpresaFornecedora: (id: string, empresa: Omit<EmpresaFornecedora, "id">) => void;
+  deleteEmpresaFornecedora: (id: string) => void;
 }
 
 const ClientesContext = createContext<ClientesContextData>({} as ClientesContextData);
@@ -555,6 +557,14 @@ export const ClientesProvider = ({ children }: ClientesProviderProps) => {
     setEmpresasFornecedoras(prev => [...prev, novaEmpresa]);
   };
 
+  const updateEmpresaFornecedora = (id: string, empresa: Omit<EmpresaFornecedora, "id">) => {
+    setEmpresasFornecedoras(prev => prev.map(e => e.id === id ? { ...e, ...empresa } : e));
+  };
+
+  const deleteEmpresaFornecedora = (id: string) => {
+    setEmpresasFornecedoras(prev => prev.filter(e => e.id !== id));
+  };
+
   return (
     <ClientesContext.Provider
       value={{
@@ -566,6 +576,8 @@ export const ClientesProvider = ({ children }: ClientesProviderProps) => {
         approveClienteFinanceiro,
         rejectClienteFinanceiro,
         addEmpresaFornecedora,
+        updateEmpresaFornecedora,
+        deleteEmpresaFornecedora,
       }}
     >
       {children}

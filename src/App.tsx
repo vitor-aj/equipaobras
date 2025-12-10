@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import Empresas from "./pages/Empresas";
 import Clientes from "./pages/Clientes";
 import Pedidos from "./pages/Pedidos";
 import NovoPedido from "./pages/NovoPedido";
@@ -83,6 +84,11 @@ const App = () => {
               <Route path="/" element={
                 <AppLayout>
                   <Dashboard />
+                </AppLayout>
+              } />
+              <Route path="/empresas" element={
+                <AppLayout>
+                  <Empresas />
                 </AppLayout>
               } />
               <Route path="/clientes" element={
