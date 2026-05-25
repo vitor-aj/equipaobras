@@ -111,14 +111,9 @@ export function PedidoDetailModal({ isOpen, onClose, onUpdateStatus, pedido }: P
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl font-bold text-foreground">
-              Detalhes do Pedido
-            </DialogTitle>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <DialogTitle className="text-2xl font-bold text-foreground">
+            Detalhes do Pedido
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-8">
