@@ -90,51 +90,55 @@ export function WorkflowStatus({ currentStep, hasError, errorMessage }: Workflow
         </div>
       </div>
 
-      <div className="relative px-8">
-        {/* Background line — entre as bordas dos círculos (sem atravessá-los) */}
-        <div className="absolute top-8 left-16 right-16 h-1 -translate-y-1/2 bg-border rounded-full" />
-
-        {/* Progress line — preenchida conforme status, sem ultrapassar os círculos */}
-        <div
-          className="absolute top-8 left-16 h-1 -translate-y-1/2 bg-success rounded-full transition-all duration-500"
-          style={{
-            width: `calc((100% - 8rem) * ${Math.min((currentStep - 1) / (steps.length - 1), 1)})`
-          }}
-        />
-
-        {/* Steps */}
-        <div className="flex items-center justify-between relative">
-          {steps.map((step) => (
-            <div key={step.id} className="flex flex-col items-center relative z-10">
-              {/* Step Circle */}
+      {/* Circles + connecting line row */}
+      <div className="flex items-center justify-between">
+        {steps.map((step, index) => (
+          <div key={step.id} className="flex items-center flex-1">
+            {/* Step Circle */}
+            <div className="flex flex-col items-center">
               <div 
                 className={`
-                  h-16 w-16 rounded-full border-2 flex items-center justify-center
-                  transition-all duration-300 shadow-custom-sm
+                  h-16 w-16 rounded-full border-2 flex items-center justify-center shrink-0
+                  transition-all duration-300 shadow-custom-sm z-10 bg-card
                   ${getStepColor(step)}
                 `}
               >
                 {getStepIcon(step)}
               </div>
-              
-              {/* Step Info */}
-              <div className="mt-4 text-center max-w-32">
-                <p className={`
-                  text-sm font-medium 
-                  ${step.status === "completed" ? "text-success" : 
-                    step.status === "current" ? "text-warning" :
-                    step.status === "error" ? "text-destructive" :
-                    "text-muted-foreground"}
-                `}>
-                  {step.title}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {step.description}
-                </p>
-              </div>
             </div>
-          ))}
-        </div>
+            
+            {/* Connector line between circles */}
+            {index < steps.length - 1 && (
+              <div className="flex-1 h-1 bg-border rounded-full relative mx-2">
+                {/* Progress fill */}
+                <div
+                  className="absolute top-0 left-0 h-full bg-success rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min((currentStep - 1) / (steps.length - 1), 1) * 100}%` }}
+                />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Text labels row */}
+      <div className="flex justify-between px-2">
+        {steps.map((step) => (
+          <div key={`label-${step.id}`} className="text-center" style={{ width: '4rem' }}>
+            <p className={`
+              text-sm font-medium 
+              ${step.status === "completed" ? "text-success" : 
+                step.status === "current" ? "text-warning" :
+                step.status === "error" ? "text-destructive" :
+                "text-muted-foreground"}
+            `}>
+              {step.title}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {step.description}
+            </p>
+          </div>
+        ))}
       </div>
 
       {/* Current Step Details */}
