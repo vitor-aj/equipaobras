@@ -70,6 +70,14 @@ export function WorkflowStatus({ currentStep, hasError, errorMessage }: Workflow
     }
   };
 
+  const getProgressWidth = () => {
+    if (steps.length <= 1) return '0%';
+    // Distância entre os centros dos círculos (primeiro ao último)
+    // 0% = entre círculo 1 e 2, 100% = entre círculo 1 e 2 completado
+    const progress = ((currentStep - 1) / (steps.length - 1)) * 100;
+    return `${Math.min(progress, 100)}%`;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -82,10 +90,21 @@ export function WorkflowStatus({ currentStep, hasError, errorMessage }: Workflow
         </div>
       </div>
 
-      <div className="relative">
+      <div className="relative px-8">
+        {/* Background line — entre os centros dos círculos */}
+        <div className="absolute top-8 left-8 right-8 h-1 bg-border rounded-full" />
+        
+        {/* Progress line — preenchida conforme status */}
+        <div 
+          className="absolute top-8 left-8 h-1 bg-success rounded-full transition-all duration-500"
+          style={{ 
+            width: `calc(${getProgressWidth()} - 4rem)` 
+          }}
+        />
+
         {/* Steps */}
         <div className="flex items-center justify-between relative">
-          {steps.map((step, index) => (
+          {steps.map((step) => (
             <div key={step.id} className="flex flex-col items-center relative z-10">
               {/* Step Circle */}
               <div 
@@ -113,24 +132,9 @@ export function WorkflowStatus({ currentStep, hasError, errorMessage }: Workflow
                   {step.description}
                 </p>
               </div>
-
-              {/* Connector Line */}
-              {index < steps.length - 1 && (
-                <div 
-                  className={`
-                    absolute top-8 left-8 w-full h-1 -z-10
-                    transition-all duration-300
-                    ${getConnectorColor(index)}
-                  `}
-                  style={{ width: 'calc(100vw / 2 - 4rem)' }}
-                />
-              )}
             </div>
           ))}
         </div>
-
-        {/* Progress Line Background */}
-        <div className="absolute top-8 left-8 right-8 h-1 bg-border -z-20 rounded-full" />
       </div>
 
       {/* Current Step Details */}
