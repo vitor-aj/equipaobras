@@ -45,13 +45,13 @@ export function WorkflowStatus({ currentStep, hasError, errorMessage }: Workflow
   const getStepColor = (step: WorkflowStep) => {
     switch (step.status) {
       case "completed":
-        return "bg-success/10 border-success/20";
+        return "bg-card border-success/30";
       case "current":
-        return "bg-warning/10 border-warning/20";
+        return "bg-card border-warning/30";
       case "error":
-        return "bg-destructive/10 border-destructive/20";
+        return "bg-card border-destructive/30";
       default:
-        return "bg-muted border-border";
+        return "bg-card border-border";
     }
   };
 
