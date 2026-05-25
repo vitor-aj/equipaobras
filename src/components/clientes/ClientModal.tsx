@@ -29,6 +29,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Upload, FileText, X, ArrowLeft, ArrowRight, CheckCircle, AlertCircle, RotateCcw } from "lucide-react";
+import { FileSpreadsheet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useClientes } from "@/contexts/ClientesContext";
 
@@ -394,9 +395,44 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">
-            {cliente?.status === "Reprovado" ? "Corrigir Cadastro - Cliente Reprovado" : cliente ? "Editar Cliente" : "Novo Cliente"}
-          </DialogTitle>
+          <div className="flex items-center justify-between pr-8">
+            <DialogTitle className="text-xl font-bold">
+              {cliente?.status === "Reprovado" ? "Corrigir Cadastro - Cliente Reprovado" : cliente ? "Editar Cliente" : "Novo Cliente"}
+            </DialogTitle>
+            {!cliente && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  form.reset({
+                    nomeFantasia: "Construtora Exemplo Ltda",
+                    razaoSocial: "Construtora Exemplo Comércio e Serviços Ltda",
+                    cnpj: "12.345.678/0001-90",
+                    inscricaoEstadual: "123.456.789.012",
+                    email: "contato@construtoraexemplo.com.br",
+                    telefone: "(11) 98765-4321",
+                    cep: "01310-100",
+                    rua: "Avenida Paulista",
+                    numero: "1000",
+                    bairro: "Bela Vista",
+                    cidade: "São Paulo",
+                    uf: "SP",
+                    tipoFaturamento: "",
+                    empresaFaturamento: "",
+                    status: "Análise da IA",
+                  });
+                  toast({
+                    title: "Planilha importada",
+                    description: "Os dados foram preenchidos automaticamente.",
+                  });
+                }}
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Importar Planilha
+              </Button>
+            )}
+          </div>
           {!cliente && (
             <div className="flex items-center justify-center gap-2 mt-4">
               {[1, 2].map((step) => (
