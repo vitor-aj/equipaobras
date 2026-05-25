@@ -91,14 +91,14 @@ export function WorkflowStatus({ currentStep, hasError, errorMessage }: Workflow
       </div>
 
       <div className="relative px-8">
-        {/* Background line — entre os centros dos círculos */}
-        <div className="absolute top-8 left-8 right-8 h-1 bg-border rounded-full" />
-        
-        {/* Progress line — preenchida conforme status */}
-        <div 
-          className="absolute top-8 left-8 h-1 bg-success rounded-full transition-all duration-500"
-          style={{ 
-            width: `calc(${getProgressWidth()} - 4rem)` 
+        {/* Background line — entre as bordas dos círculos (sem atravessá-los) */}
+        <div className="absolute top-8 left-16 right-16 h-1 -translate-y-1/2 bg-border rounded-full" />
+
+        {/* Progress line — preenchida conforme status, sem ultrapassar os círculos */}
+        <div
+          className="absolute top-8 left-16 h-1 -translate-y-1/2 bg-success rounded-full transition-all duration-500"
+          style={{
+            width: `calc((100% - 8rem) * ${Math.min((currentStep - 1) / (steps.length - 1), 1)})`
           }}
         />
 
