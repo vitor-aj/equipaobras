@@ -777,25 +777,9 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Empresa que será Faturada</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione a empresa" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {empresasFornecedoras.map((empresa) => (
-                                <SelectItem key={empresa.id} value={empresa.nome}>
-                                  {empresa.nome} {empresa.cnpj && `(${empresa.cnpj})`}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {empresasFornecedoras.length === 0 && (
-                            <p className="text-xs text-muted-foreground">
-                              Nenhuma empresa cadastrada. Cadastre empresas em "Empresas" no menu lateral.
-                            </p>
-                          )}
+                          <FormControl>
+                            <Input placeholder="Digite o nome da empresa" {...field} />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
