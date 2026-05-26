@@ -452,53 +452,7 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
             {/* Etapa 1: Dados da Empresa */}
             {(cliente || (!cliente && currentStep === 1)) && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between gap-4">
-                  <h3 className="text-lg font-semibold">Dados da Empresa</h3>
-                  {!cliente && (
-                    <>
-                      <input
-                        id="import-planilha-input"
-                        type="file"
-                        accept=".xlsx,.xls,.csv"
-                        className="hidden"
-                        onChange={(e) => {
-                          // Independente do arquivo escolhido, preenche com dados fictícios
-                          e.target.value = "";
-                          form.reset({
-                            nomeFantasia: "Construtora Exemplo Ltda",
-                            razaoSocial: "Construtora Exemplo Comércio e Serviços Ltda",
-                            cnpj: "12.345.678/0001-90",
-                            inscricaoEstadual: "123.456.789.012",
-                            email: "contato@construtoraexemplo.com.br",
-                            telefone: "(11) 98765-4321",
-                            cep: "01310-100",
-                            rua: "Avenida Paulista",
-                            numero: "1000",
-                            bairro: "Bela Vista",
-                            cidade: "São Paulo",
-                            uf: "SP",
-                            tipoFaturamento: "",
-                            empresaFaturamento: "",
-                            status: "Análise da IA",
-                          });
-                          toast({
-                            title: "Planilha importada",
-                            description: "Os dados foram preenchidos automaticamente.",
-                          });
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => document.getElementById("import-planilha-input")?.click()}
-                      >
-                        <FileSpreadsheet className="h-4 w-4 mr-2" />
-                        Importar Planilha
-                      </Button>
-                    </>
-                  )}
-                </div>
+                <h3 className="text-lg font-semibold">Dados da Empresa</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -565,8 +519,21 @@ export const ClientModal = ({ isOpen, onClose, onSave, cliente }: ClientModalPro
                               field.onChange(formatted);
                             }}
                             maxLength={15}
+                            disabled={field.value === "ISENTO"}
                           />
                         </FormControl>
+                        <div className="flex items-center gap-2 pt-1">
+                          <Checkbox
+                            id="ie-isento"
+                            checked={field.value === "ISENTO"}
+                            onCheckedChange={(checked) => {
+                              field.onChange(checked ? "ISENTO" : "");
+                            }}
+                          />
+                          <label htmlFor="ie-isento" className="text-sm text-foreground cursor-pointer">
+                            ISENTO (empresa não possui Inscrição Estadual)
+                          </label>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
